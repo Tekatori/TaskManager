@@ -1,0 +1,279 @@
+﻿@model List<TaskManager.Models.TaskItem>
+@{
+    ViewData["Title"] = "Danh sách công việc";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int stt = 0;
+}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<div class="container py-4">
+    <h2 class="mb-4">📋 @ViewBag.ProjectName - Danh sách công việc</h2>
+
+
+    <div class="mb-3 text-end">
+        <a href="/Project/Index" class="btn btn-secondary me-2">
+            <i class="bi bi-arrow-left-circle"></i> Quay về danh sách dự án
+        </a>
+
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+            <i class="bi bi-plus-circle"></i> Thêm công việc
+        </button>
+    </div>
+
+
+    <table class="table table-bordered table-hover shadow-sm">
+        <thead class="table-light text-center">
+            <tr>
+                <th>STT</th>
+                <th>Tiêu đề</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                foreach (var task in Model)
+                {
+                    stt++;
+                    var detailRowId = $"details-{task.Id}";
+                    <tr class="main-row" onclick="toggleDetails('@detailRowId')" style="cursor: pointer;">
+                        <td class="text-center">@stt</td>
+                        <td>@task.Title</td>
+                        <td class="text-center">
+                            <a onclick="openEditModal('@task.Id')" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Sửa">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a href="#" onclick="event.stopPropagation(); confirmDelete('@task.Id')" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Xóa">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr id="@detailRowId" class="detail-row" style="display: none;">
+                        <td colspan="3">
+                            <div class="p-2">
+                                <strong>Mô tả:</strong> @task.Description <br />
+                                <strong>Trạng thái:</strong> @task.Status <br />
+                                <strong>Ưu tiên:</strong> @task.Priority <br />
+                                <strong>Hạn chót:</strong> @task.DueDate?.ToString("dd/MM/yyyy") <br />
+                                <strong>Ngày tạo:</strong> @task.CreatedAt?.ToString("dd/MM/yyyy")<br />
+                                <strong>Ngày cập nhật:</strong> @task.UpdatedAt?.ToString("dd/MM/yyyy")
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center text-muted">Không có công việc nào</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<!-- 🔽 Modal Thêm Task -->
+<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form id="createTaskForm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTaskModalLabel">📝 Thêm công việc mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Tiêu đề</label>
+                        <input type="text" class="form-control" name="Title" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Độ ưu tiên</label>
+                        <select class="form-select" name="Priority">
+                            <option>Low</option>
+                            <option>Medium</option>
+                            <option>High</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Mô tả</label>
+                        <textarea class="form-control" name="Description" rows="3"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Trạng thái</label>
+                        <select class="form-select" name="Status">
+                            <option>Pending</option>
+                            <option>InProgress</option>
+                            <option>Done</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Hạn chót</label>
+                        <input type="date" class="form-control" name="DueDate" />
+                    </div>
+                    <input type="hidden" name="ProjectId" value="@Context.Request.Query["id"]" />
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 🔧 Modal Sửa Task -->
+<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form id="editTaskForm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTaskModalLabel">✏️ Sửa công việc</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <input type="hidden" id="editId" name="Id" />
+                    <input type="hidden" name="ProjectId" value="@Context.Request.Query["id"]" />
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Tiêu đề</label>
+                        <input type="text" class="form-control" id="editTitle" name="Title" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Độ ưu tiên</label>
+                        <select class="form-select" id="editPriority" name="Priority">
+                            <option>Low</option>
+                            <option>Medium</option>
+                            <option>High</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Mô tả</label>
+                        <textarea class="form-control" id="editDescription" name="Description" rows="3"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Trạng thái</label>
+                        <select class="form-select" id="editStatus" name="Status">
+                            <option>Pending</option>
+                            <option>InProgress</option>
+                            <option>Done</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Hạn chót</label>
+                        <input type="date" class="form-control" id="editDueDate" name="DueDate" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Lưu thay đổi</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+            // Thêm task
+            $('#createTaskForm').submit(function (e) {
+                e.preventDefault();
+                var data = $(this).serialize();
+
+                $.post('/Task/Create', data, function (res) {
+                    if (res.success) {
+                        Swal.fire('Thành công!', 'Đã thêm công việc.', 'success').then(() => location.reload());
+                    } else {
+                        Swal.fire('Lỗi', res.error || 'Không thể thêm', 'error');
+                    }
+                });
+            });
+
+            // Sửa task
+            $('#editTaskForm').submit(function (e) {
+                e.preventDefault();
+                var data = $(this).serialize();
+
+                $.post('/Task/Edit', data, function (res) {
+                    if (res.success) {
+                        Swal.fire('Đã cập nhật!', '', 'success').then(() => location.reload());
+                    } else {
+                        Swal.fire('Lỗi', res.error || 'Không thể cập nhật', 'error');
+                    }
+                });
+            });
+        });
+
+        function openEditModal(id) {
+            $.ajax({
+                url: '/Task/GetTaskById?id=' + id,
+                type: 'GET',
+                success: function (res) {
+                    if (res.success) {
+                        const task = res.data;
+
+                        $('#editId').val(task.id);
+                        $('#editTitle').val(task.title);
+                        $('#editDescription').val(task.description);
+                        $('#editPriority').val(task.priority);
+                        $('#editStatus').val(task.status);
+                        $('#editDueDate').val(task.dueDate ? task.dueDate.substring(0, 10) : '');
+                        $('#editTaskModal').modal('show');
+                    } else {
+                        Swal.fire('Lỗi', res.error || 'Không thể lấy dữ liệu.', 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Lỗi', 'Không thể kết nối đến máy chủ.', 'error');
+                }
+            });
+        }
+
+        function confirmDelete(TaskId) {
+            Swal.fire({
+                title: 'Bạn có chắc muốn xóa?',
+                text: "Hành động này không thể hoàn tác!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Task/DeleteTask',
+                        type: 'POST',
+                        data: { id: TaskId },
+                        success: function (res) {
+                            if (res.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Đã xóa công việc!',
+                                    timer: 1000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Lỗi', res.error || 'Không thể xóa.', 'error');
+                            }
+                        },
+                        error: function () {
+                            Swal.fire('Lỗi', 'Không thể kết nối server.', 'error');
+                        }
+                    });
+                }
+            });
+        }
+        function toggleDetails(id) {
+            const row = document.getElementById(id);
+            if (row) {
+                row.style.display = (row.style.display === "none") ? "table-row" : "none";
+            }
+        }
+    </script>
+
+}

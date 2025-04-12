@@ -1,0 +1,99 @@
+﻿
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h4 class="text-center mb-4">📝 Tạo tài khoản mới</h4>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+
+                    <form id="registerForm">
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-bold">Tên đăng nhập</label>
+                            <input type="text" class="form-control" id="username" placeholder="Nhập tên đăng nhập" name="username" required oninvalid="this.setCustomValidity('Vui lòng nhập tên đăng nhập')" oninput="this.setCustomValidity('')" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-bold">Email</label>
+                            <input type="email" class="form-control" id="email" placeholder="Nhập tên email" name="email" required oninvalid="this.setCustomValidity('Vui lòng nhập đúng định dạng email, ví dụ: example@gmail.com')" oninput="this.setCustomValidity('')"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label fw-bold">Mật khẩu</label>
+                            <input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu" name="password" required oninvalid="this.setCustomValidity('Vui lòng nhập mật khẩu')" oninput="this.setCustomValidity('')" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label fw-bold">Xác nhận mật khẩu</label>
+                            <input type="password" class="form-control" id="confirmPassword" placeholder="Nhập lại mật khẩu" name="confirmPassword" required oninvalid="this.setCustomValidity('Vui lòng nhập mật khẩu')" oninput="this.setCustomValidity('')" />
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Đăng ký</button>
+                        </div>
+                    </form>
+
+                    <div class="mt-4 text-center">
+                        <span>Đã có tài khoản? <a href="/User/Login">Đăng nhập</a></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#registerForm').on('submit', function (e) {
+                e.preventDefault(); 
+
+                const data = {
+                    Username: $('#username').val(),
+                    Email: $('#email').val(),
+                    Password: $('#password').val(),
+                    PasswordConfirm: $('#confirmPassword').val(),
+                };
+
+                $.ajax({
+                    url: '/User/Register',
+                    type: 'POST',
+                    data: data,
+                    success: function (response) {
+                        if (response.error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Đăng ký thất bại',
+                                text: response.error
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Đăng ký thành công',
+                                text: 'Bạn có thể đăng nhập ngay bây giờ'
+                            }).then(() => {
+                                window.location.href = '/User/Login';
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi server',
+                            text: 'Không thể kết nối đến máy chủ.'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

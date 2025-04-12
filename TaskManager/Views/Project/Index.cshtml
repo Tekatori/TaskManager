@@ -1,0 +1,213 @@
+﻿@model IEnumerable<TaskManager.Models.Project>
+
+@{
+    ViewData["Title"] = "Quản lý Dự án";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int stt = 1;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary mb-0">📁 Danh sách Dự án</h2>
+        <button class="btn btn-success" onclick="openAddModal()">
+            ➕ Thêm Dự án
+        </button>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Chưa có dự án nào được tạo.</div>
+    }
+    else
+    {
+        <table class="table table-bordered table-hover shadow-sm">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-center align-middle" style="width: 60px;">STT</th>
+                    <th class="text-start align-middle">Tên dự án</th>
+                    <th class="text-start align-middle">Mô tả</th>
+                    <th class="text-center align-middle" style="width: 150px;">Ngày tạo</th>
+                    <th class="text-center align-middle" style="width: 220px;">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            @foreach (var project in Model)
+            {
+                <tr>
+                    <td class="text-center align-middle">@stt</td>
+                    <td class="text-start align-middle">@project.Name</td>
+                    <td class="text-start align-middle">@project.Description</td>
+                    <td class="text-center align-middle">@project.CreatedAt?.ToString("dd/MM/yyyy")</td>
+                    <td class="text-center align-middle">
+                            <a href="/Task/Index?id=@project.Id"
+                               class="btn btn-sm btn-info"
+                               title="Xem chi tiết dự án">
+                                Chi tiết
+                            </a>
+                            <button class="btn btn-sm btn-warning" onclick="openEditModal(@project.Id)">Sửa</button>
+                            <button class="btn btn-sm btn-danger" onclick="confirmDelete(@project.Id)">Xóa</button>
+                    </td>
+                </tr>
+                stt++;
+        }
+    </tbody>
+</table>
+
+
+    }
+</div>
+
+
+<div style="margin-left:150px" class="modal fade" id="projectModal" tabindex="-1" aria-labelledby="projectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form id="projectForm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="projectModalLabel">➕ Thêm Dự án</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body row">
+                    <input type="hidden" id="ProjectId" name="Id" />
+
+                    <div class="mb-5">
+                        <label for="Name" class="form-label fw-bold">Tên dự án</label>
+                        <input type="text" class="form-control" id="Name" name="Name" maxlength="255" required
+                               oninvalid="this.setCustomValidity('Vui lòng nhập tên dự án')"
+                               oninput="this.setCustomValidity('')" />
+                    </div>
+                    <div class="mb-5">
+                        <label for="Description" class="form-label fw-bold">Mô tả</label>
+                        <textarea class="form-control" id="Description" name="Description" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#projectForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const id = $('#ProjectId').val();
+                const isEdit = id && parseInt(id) > 0;
+
+                const data = {
+                    Id: id,
+                    Name: $('#Name').val(),
+                    Description: $('#Description').val()
+                };
+
+                $.ajax({
+                    url: isEdit ? '/Project/Edit' : '/Project/Create',
+                    type: 'POST',
+                    data: data,
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: isEdit ? 'Cập nhật thành công!' : 'Tạo dự án thành công!',
+                                text: 'Trang sẽ tự làm mới...',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi',
+                                text: response.error || 'Không thể xử lý yêu cầu.'
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi server',
+                            text: 'Vui lòng thử lại sau.'
+                        });
+                    }
+                });
+            });
+        });
+
+        function openEditModal(id) {
+            $.ajax({
+                url: '/Project/GetProjectById?id=' + id,
+                type: 'GET',
+                success: function (res) {
+                    if (res.success) {
+                        const project = res.data;
+
+                        $('#ProjectId').val(project.id);
+                        $('#Name').val(project.name);
+                        $('#Description').val(project.description);
+                        $('#projectModalLabel').text('✏️ Chỉnh sửa Dự án');
+                        $('#projectModal').modal('show');
+                    } else {
+                        Swal.fire('Lỗi', res.error || 'Không thể lấy dữ liệu.', 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Lỗi', 'Không thể kết nối đến máy chủ.', 'error');
+                }
+            });
+        }
+
+
+        function openAddModal() {
+            $('#ProjectId').val('');
+            $('#Name').val('');
+            $('#Description').val('');
+            $('#projectModalLabel').text('➕ Thêm Dự án');
+            $('#projectModal').modal('show');
+        }
+        function confirmDelete(projectId) {
+            Swal.fire({
+                title: 'Bạn có chắc muốn xóa?',
+                text: "Hành động này không thể hoàn tác!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Project/DeleteProject',
+                        type: 'POST',
+                        data: { id: projectId },
+                        success: function (res) {
+                            if (res.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Đã xóa dự án!',
+                                    timer: 1000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Lỗi', res.error || 'Không thể xóa.', 'error');
+                            }
+                        },
+                        error: function () {
+                            Swal.fire('Lỗi', 'Không thể kết nối server.', 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+
+}

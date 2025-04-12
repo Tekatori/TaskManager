@@ -1,0 +1,94 @@
+﻿
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h4 class="text-center mb-4">🔐 Đăng nhập hệ thống</h4>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-bold">Tên đăng nhập</label>
+                            <input type="text" class="form-control" placeholder="Nhập tên đăng nhập hoặc email" id="username" name="username" required oninvalid="this.setCustomValidity('Vui lòng nhập tên đăng nhập')" oninput="this.setCustomValidity('')" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label fw-bold">Mật khẩu</label>
+                            <input type="password" class="form-control" placeholder="Nhập mật khẩu" id="password" name="password" required oninvalid="this.setCustomValidity('Vui lòng nhập mật khẩu')" oninput="this.setCustomValidity('')" />
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="#" class="text-decoration-none small">Quên mật khẩu?</a>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Đăng nhập</button>
+                        </div>
+                    </form>
+
+                    <div class="mt-4 text-center">
+                        <span>Chưa có tài khoản? <a href="/User/Register">Đăng ký ngay</a></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#loginForm').on('submit', function (e) {
+                e.preventDefault();
+                const data = {
+                    Username: $('#username').val(),
+                    Password: $('#password').val(),
+                    RememberMe: $('#remember').is(':checked')
+                };
+
+                $.ajax({
+                    url: '/User/Login',
+                    type: 'POST',
+                    data: data,
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Đăng nhập thành công',
+                                text: 'Chuyển hướng trong giây lát...',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.href = response.redirectUrl;
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi',
+                                text: response.error || 'Đăng nhập thất bại'
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi kết nối',
+                            text: 'Không thể gửi yêu cầu đến server.'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}
