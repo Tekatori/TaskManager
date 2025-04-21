@@ -8,7 +8,7 @@
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public string PasswordConfirm { get; set; } = string.Empty;
-        public string Role { get; set; } = "User";
+        public int? Role { get; set; } = 0;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

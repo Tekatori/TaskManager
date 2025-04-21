@@ -14,8 +14,8 @@ namespace TaskManager.Models
         public string Title { get; set; } = string.Empty;
         public string? Description { get; set; }
 
-        public string Status { get; set; } = "Pending"; // Enum: Pending, InProgress, Done
-        public string Priority { get; set; } = "Medium"; // Enum: Low, Medium, High
+        public int Status { get; set; } = 0; 
+        public int Priority { get; set; } = 0; 
 
         public DateTime? DueDate { get; set; }
         public int? ProjectId { get; set; }
