@@ -14,9 +14,13 @@ namespace TaskManager.Controllers
         {
             _projectService = projectService;
         }
-        public IActionResult Index()
+        public IActionResult Index(string textsearch = "")
         {
             var projects = _projectService.GetAllProject();
+            if(!string.IsNullOrEmpty(textsearch))
+            {
+                projects = projects.Where(p => p.Name != null && p.Name.ToLower().Contains(textsearch.ToLower())).ToList();
+            }
             return View(projects);
         }
         [HttpPost]

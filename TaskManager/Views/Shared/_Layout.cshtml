@@ -1,8 +1,4 @@
-﻿@*
-  Layout gốc lấy từ Webkit Admin Template
-  Không tách Header/Sidebar/Footer
-*@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -31,7 +27,7 @@
 
         <div class="iq-sidebar  sidebar-default ">
             <div class="iq-sidebar-logo d-flex align-items-center">
-                <a href="#" class="header-logo">
+                <a href="/User/Index" class="header-logo">
                     <img src="~/img/logo.png" alt="logo" />
                     <h3 class="logo-title light-logo">Teka Dev</h3>
                 </a>
@@ -44,7 +40,7 @@
                     <nav class="iq-sidebar-menu">
                         <ul id="iq-sidebar-toggle" class="iq-menu">
                             <li class="active">
-                                <a href="#" class="svg-icon">
+                                <a href="/Home/Index" class="svg-icon">
                                     <svg class="svg-icon" width="25" height="25" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                         <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -53,25 +49,25 @@
                                 </a>
                             </li>
                             <li class="">
-                                <a href="#" class="svg-icon">
+                                <a href="/Project/Index" class="svg-icon">
                                     <svg class="svg-icon" width="25" height="25" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <polyline points="6 9 6 2 18 2 18 9"></polyline>
                                         <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
                                         <rect x="6" y="14" width="12" height="8"></rect>
                                     </svg>
-                                    <span class="ml-4">Projects</span>
+                                    <span class="ml-4">Dự án</span>
                                 </a>
                             </li>
                             <li class="">
-                                <a href="#" class="svg-icon">
+                                <a href="/Task/Index" class="svg-icon">
                                     <svg class="svg-icon" width="25" height="25" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
                                         <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
                                     </svg>
-                                    <span class="ml-4">Task</span>
+                                    <span class="ml-4">Công việc</span>
                                 </a>
                             </li>
-                            <li class="">
+                          @*   <li class="">
                                 <a href="#" class="svg-icon">
                                     <svg class="svg-icon" width="25" height="25" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -79,7 +75,7 @@
                                     </svg>
                                     <span class="ml-4">Employees</span>
                                 </a>
-                            </li>
+                            </li> *@
 
                             <li class="">
                                 <a href="#" class="svg-icon">
@@ -89,7 +85,7 @@
                                         <line x1="8" y1="2" x2="8" y2="6"></line>
                                         <line x1="3" y1="10" x2="21" y2="10"></line>
                                     </svg>
-                                    <span class="ml-4">Calender</span>
+                                    <span class="ml-4">Lịch</span>
                                 </a>
                             </li>
                         </ul>
@@ -121,7 +117,7 @@
                     <div class="iq-navbar-logo d-flex align-items-center justify-content-between">
                         <i class="ri-menu-line wrapper-menu"></i>
                         <a href="#" class="header-logo">
-                            <h4 class="logo-title text-uppercase">Webkit</h4>
+                            <h4 class="logo-title text-uppercase">Teka Dev</h4>
 
                         </a>
                     </div>
@@ -220,137 +216,9 @@
 
     <!-- Wrapper End-->
     <!-- Modal list start -->
-    <div class="modal fade" role="dialog" aria-modal="true" id="new-project-modal">
-        <div class="modal-dialog  modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header d-block text-center pb-3 border-bttom">
-                    <h3 class="modal-title" id="exampleModalCenterTitle01">New Project</h3>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="form-group mb-3">
-                                <label for="exampleInputText01" class="h5">Project Name*</label>
-                                <input type="text" class="form-control" id="exampleInputText01" placeholder="Project Name">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group mb-3">
-                                <label for="exampleInputText2" class="h5">Categories *</label>
-                                <div class="dropdown bootstrap-select form-control">
-                                    <select name="type" class="selectpicker form-control" data-style="py-0">
-                                        <option>Category</option>
-                                        <option>Android</option>
-                                        <option>IOS</option>
-                                        <option>Ui/Ux Design</option>
-                                        <option>Development</option>
-                                    </select><button type="button" tabindex="-1" class="btn dropdown-toggle py-0" data-toggle="dropdown" role="combobox" aria-owns="bs-select-1" aria-haspopup="listbox" aria-expanded="false" title="Category"><div class="filter-option"><div class="filter-option-inner"><div class="filter-option-inner-inner">Category</div></div> </div></button><div class="dropdown-menu "><div class="inner show" role="listbox" id="bs-select-1" tabindex="-1"><ul class="dropdown-menu inner show" role="presentation"></ul></div></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group mb-3">
-                                <label for="exampleInputText004" class="h5">Due Dates*</label>
-                                <input type="date" class="form-control" id="exampleInputText004" value="">
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="form-group mb-3">
-                                <label for="exampleInputText07" class="h5">Assign Members*</label>
-                                <input type="text" class="form-control" id="exampleInputText07">
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="d-flex flex-wrap align-items-ceter justify-content-center mt-2">
-                                <div class="btn btn-primary mr-3" data-dismiss="modal">Save</div>
-                                <div class="btn btn-primary" data-dismiss="modal">Cancel</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade bd-example-modal-lg" role="dialog" aria-modal="true" id="new-task-modal">
-        <div class="modal-dialog  modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header d-block text-center pb-3 border-bttom">
-                    <h3 class="modal-title" id="exampleModalCenterTitle">New Task</h3>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="form-group mb-3">
-                                <label for="exampleInputText02" class="h5">Task Name</label>
-                                <input type="text" class="form-control" id="exampleInputText02" placeholder="Enter task Name">
-                                <a href="#" class="task-edit text-body"><i class="ri-edit-box-line"></i></a>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group mb-3">
-                                <label for="exampleInputText2" class="h5">Assigned to</label>
-                                <div class="dropdown bootstrap-select form-control">
-                                    <select name="type" class="selectpicker form-control" data-style="py-0">
-                                        <option>Memebers</option>
-                                        <option>Kianna Septimus</option>
-                                        <option>Jaxson Herwitz</option>
-                                        <option>Ryan Schleifer</option>
-                                    </select><button type="button" tabindex="-1" class="btn dropdown-toggle py-0" data-toggle="dropdown" role="combobox" aria-owns="bs-select-2" aria-haspopup="listbox" aria-expanded="false" title="Memebers"><div class="filter-option"><div class="filter-option-inner"><div class="filter-option-inner-inner">Memebers</div></div> </div></button><div class="dropdown-menu "><div class="inner show" role="listbox" id="bs-select-2" tabindex="-1"><ul class="dropdown-menu inner show" role="presentation"></ul></div></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group mb-3">
-                                <label for="exampleInputText05" class="h5">Due Dates*</label>
-                                <input type="date" class="form-control" id="exampleInputText05" value="">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group mb-3">
-                                <label for="exampleInputText2" class="h5">Category</label>
-                                <div class="dropdown bootstrap-select form-control">
-                                    <select name="type" class="selectpicker form-control" data-style="py-0">
-                                        <option>Design</option>
-                                        <option>Android</option>
-                                        <option>IOS</option>
-                                        <option>Ui/Ux Design</option>
-                                        <option>Development</option>
-                                    </select><button type="button" tabindex="-1" class="btn dropdown-toggle py-0" data-toggle="dropdown" role="combobox" aria-owns="bs-select-3" aria-haspopup="listbox" aria-expanded="false" title="Design"><div class="filter-option"><div class="filter-option-inner"><div class="filter-option-inner-inner">Design</div></div> </div></button><div class="dropdown-menu "><div class="inner show" role="listbox" id="bs-select-3" tabindex="-1"><ul class="dropdown-menu inner show" role="presentation"></ul></div></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="form-group mb-3">
-                                <label for="exampleInputText040" class="h5">Description</label>
-                                <textarea class="form-control" id="exampleInputText040" rows="2"></textarea>
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="form-group mb-3">
-                                <label for="exampleInputText005" class="h5">Checklist</label>
-                                <input type="text" class="form-control" id="exampleInputText005" placeholder="Add List">
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="form-group mb-0">
-                                <label for="exampleInputText01" class="h5">Attachments</label>
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="inputGroupFile003">
-                                    <label class="custom-file-label" for="inputGroupFile003">Upload media</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="d-flex flex-wrap align-items-ceter justify-content-center mt-4">
-                                <div class="btn btn-primary mr-3" data-dismiss="modal">Save</div>
-                                <div class="btn btn-primary" data-dismiss="modal">Cancel</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+ 
+
+
     <div class="modal fade bd-example-modal-lg" role="dialog" aria-modal="true" id="new-user-modal">
         <div class="modal-dialog  modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">

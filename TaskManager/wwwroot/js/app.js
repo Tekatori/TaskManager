@@ -143,18 +143,47 @@ Index Of Script
         Sidebar Widget
         -----------------------------------------------------------------------*/
 
-  jQuery(document).on("click", ".iq-menu > li > a", function () {
-    jQuery(".iq-menu > li > a").parent().removeClass("active");
-    jQuery(this).parent().addClass("active");
-  });
+  //jQuery(document).on("click", ".iq-menu > li > a", function () {
+  //  jQuery(".iq-menu > li > a").parent().removeClass("active");
+  //  jQuery(this).parent().addClass("active");
+  //});
 
-  // Active menu
-  var parents = jQuery("li.active").parents(".iq-submenu.collapse");
+  //// Active menu
+  //var parents = jQuery("li.active").parents(".iq-submenu.collapse");
 
-  parents.addClass("show");
+  //parents.addClass("show");
 
-  parents.parents("li").addClass("active");
-  jQuery('li.active > a[aria-expanded="false"]').attr("aria-expanded", "true");
+  //parents.parents("li").addClass("active");
+  //  jQuery('li.active > a[aria-expanded="false"]').attr("aria-expanded", "true");
+
+
+    jQuery(document).ready(function () {
+        var currentUrl = window.location.pathname.toLowerCase();
+
+        jQuery(".iq-menu > li").each(function () {
+            var anchor = jQuery(this).find("a").attr("href");
+
+            if (anchor && currentUrl.startsWith(anchor.toLowerCase())) {
+                jQuery(this).addClass("active");
+            } else {
+                jQuery(this).removeClass("active");
+            }
+        });
+
+        var parents = jQuery("li.active").parents(".iq-submenu.collapse");
+        parents.addClass("show");
+        parents.parents("li").addClass("active");
+        jQuery('li.active > a[aria-expanded="false"]').attr("aria-expanded", "true");
+    });
+
+
+    jQuery(document).on("click", ".iq-menu > li > a", function () {
+        jQuery(".iq-menu > li").removeClass("active");
+        jQuery(this).closest("li").addClass("active");
+    });
+
+
+
 
   /*---------------------------------------------------------------------
         FullScreen
@@ -633,7 +662,7 @@ Index Of Script
     $(document).on('click', '[data-toggle-extra="tab"]', function () {
       const target = $(this).attr('data-target-extra')
       $('[data-toggle-extra="tab-content"]').removeClass('active')
-      console.log($(target))
+      //console.log($(target))
       $(target).addClass('active')
       $(this).parent().find('.active').removeClass('active')
       $(this).addClass('active')

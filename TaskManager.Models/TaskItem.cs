@@ -14,6 +14,8 @@ namespace TaskManager.Models
         public string Title { get; set; } = string.Empty;
         public string? Description { get; set; }
 
+        public string? Notes { get; set; }
+
         public int Status { get; set; } = 0; 
         public int Priority { get; set; } = 0; 
 

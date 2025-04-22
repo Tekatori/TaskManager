@@ -76,6 +76,7 @@ namespace TaskManager.DAL
                 taskItem.UpdatedAt = pTask.UpdatedAt;
                 taskItem.ProjectId = pTask.ProjectId;
                 taskItem.AssignedTo = pTask.AssignedTo;
+                taskItem.Notes = pTask.Notes;
             }
             else if (pIsDelete == true && taskItem != null)
             {

@@ -11,4 +11,9 @@
         public int? Role { get; set; } = 0;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
+    public class TaskParam
+    {
+        public int IdProject { get; set; } = 0;
+        public string textsearch { get; set; } = string.Empty;
+    }
 }

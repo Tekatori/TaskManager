@@ -3,89 +3,197 @@
 @{
     ViewData["Title"] = "Quản lý Dự án";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    int stt = 1;
 }
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary mb-0">📁 Danh sách Dự án</h2>
-        <button class="btn btn-success" onclick="openAddModal()">
-            ➕ Thêm Dự án
-        </button>
-    </div>
-
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info">Chưa có dự án nào được tạo.</div>
+<style>
+    .alert-info {
+        background-color: #e9f7fc;
+        color: #2c6e8f;
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 16px;
     }
-    else
-    {
-        <table class="table table-bordered table-hover shadow-sm">
-            <thead class="table-light">
-                <tr>
-                    <th class="text-center align-middle" style="width: 60px;">STT</th>
-                    <th class="text-start align-middle">Tên dự án</th>
-                    <th class="text-start align-middle">Mô tả</th>
-                    <th class="text-center align-middle" style="width: 150px;">Ngày tạo</th>
-                    <th class="text-center align-middle" style="width: 220px;">Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
 
+        .alert-info i {
+            font-size: 18px;
+            vertical-align: middle;
+        }
+
+
+</style>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex flex-wrap align-items-center justify-content-between breadcrumb-content">
+                    <h5>📁 Danh sách Dự án</h5>
+                    <div class="d-flex flex-wrap align-items-center justify-content-between">
+                      @*   <div class="dropdown status-dropdown mr-3">
+                            <div class="dropdown-toggle" id="dropdownMenuButton03" data-toggle="dropdown">
+                                <div class="btn bg-body"><span class="h6">Status :</span> In Progress<i class="ri-arrow-down-s-line ml-2 mr-0"></i></div>
+                            </div>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton03">
+                                <a class="dropdown-item" href="#"><i class="ri-mic-line mr-2"></i>In Progress</a>
+                                <a class="dropdown-item" href="#"><i class="ri-attachment-line mr-2"></i>Priority</a>
+                                <a class="dropdown-item" href="#"><i class="ri-file-copy-line mr-2"></i>Category</a>
+                            </div>
+                        </div> *@
+                        <div class="iq-search-bar device-search mr-3">
+                            <form id="Search" class="searchbox">
+                                <button type="submit" class="search-link"><i class="ri-search-line"></i></button>
+
+                                <input id="searchtext" maxlength="200" type="text" class="text search-input" placeholder="Tên dự án...">
+                            </form>
+                        </div>
+
+                        <div class="list-grid-toggle d-flex align-items-center mr-3">
+                            <div data-toggle-extra="tab" data-target-extra="#grid" class="active">
+                                <div class="grid-icon mr-3">
+                                    <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="7" height="7"></rect>
+                                        <rect x="14" y="3" width="7" height="7"></rect>
+                                        <rect x="14" y="14" width="7" height="7"></rect>
+                                        <rect x="3" y="14" width="7" height="7"></rect>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div data-toggle-extra="tab" data-target-extra="#list">
+                                <div class="grid-icon">
+                                    <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="21" y1="10" x2="3" y2="10"></line>
+                                        <line x1="21" y1="6" x2="3" y2="6"></line>
+                                        <line x1="21" y1="14" x2="3" y2="14"></line>
+                                        <line x1="21" y1="18" x2="3" y2="18"></line>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pl-3 border-left btn-new">
+                            <a href="#" onclick="openAddModal()" class="btn btn-primary"> ➕ Thêm Dự án</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="grid" class="item-content animate__animated animate__fadeIn active" data-toggle-extra="tab-content">
+    <div class="row">
+        @if (!Model.Any())
+        {
+            <div class="col-lg-12 col-md-6 text-center">
+                <H3 class="text-center text-muted"><i class="ri-information-line mr-2"></i> Không tìm thấy dự án</H3>
+            </div>
+        }
+        else
+        {
             @foreach (var project in Model)
             {
-                <tr>
-                    <td class="text-center align-middle">@stt</td>
-                    <td class="text-start align-middle">@project.Name</td>
-                    <td class="text-start align-middle">@project.Description</td>
-                    <td class="text-center align-middle">@project.CreatedAt?.ToString("dd/MM/yyyy")</td>
-                    <td class="text-center align-middle">
-                            <a href="/Task/Index?id=@project.Id"
-                               class="btn btn-sm btn-info"
-                               title="Xem chi tiết dự án">
-                                Chi tiết
-                            </a>
-                            <button class="btn btn-sm btn-warning" onclick="openEditModal(@project.Id)">Sửa</button>
-                            <button class="btn btn-sm btn-danger" onclick="confirmDelete(@project.Id)">Xóa</button>
-                    </td>
-                </tr>
-                stt++;
+                <div class="col-lg-4 col-md-6">
+                    <div class="card card-block card-stretch card-height">
+                        <div class="card-body">
+                            <h5 class="mb-1">@project.Name</h5>
+                            <p class="mb-3">@project.Description <br />Ngày tạo: @project.CreatedAt?.ToString("dd/MM/yyyy")</p>
+                            <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                                <a href="/Task/Index?IdProject=@project.Id"
+                                   class="btn btn-white text-info link-shadow"
+                                   title="Xem chi tiết dự án">
+                                    Chi tiết
+                                </a>
+                                <button class="btn btn-white text-warning link-shadow" onclick="openEditModal(@project.Id)">Sửa</button>
+                                <button class="btn btn-white text-danger link-shadow" onclick="confirmDelete(@project.Id)">Xóa</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         }
-    </tbody>
-</table>
 
-
-    }
+    </div>
+</div>
+<div id="list" class="item-content animate__animated animate__fadeIn" data-toggle-extra="tab-content">
+    <div class="row">
+        @if (!Model.Any())
+        {
+            <div class="col-lg-12 col-md-6 text-center">
+                <H3 class="text-center text-muted"><i class="ri-information-line mr-2"></i> Không tìm thấy dự án</H3>
+            </div>
+        }
+        else
+        {
+            @foreach (var project in Model)
+            {
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                   
+                                     <div class="row">                                                                 
+                                        <div class="col-sm-8">
+                                            <div class="d-flex align-items-center">
+                                                <div class="ml-3">
+                                                    <h5 class="mb-1">@project.Name</h5>
+                                                    <p class="mb-0">@project.Description <br />Ngày tạo: @project.CreatedAt?.ToString("dd/MM/yyyy")</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 text-sm-right mt-3 mt-sm-0">
+                                            <a href="/Task/Index?IdProject=@project.Id"
+                                               class="btn btn-white text-info link-shadow"
+                                               title="Xem chi tiết dự án">
+                                                Chi tiết
+                                            </a>
+                                            <button class="btn btn-white text-warning link-shadow" onclick="openEditModal(@project.Id)">Sửa</button>
+                                            <button class="btn btn-white text-danger link-shadow" onclick="confirmDelete(@project.Id)">Xóa</button>
+                                        </div>        
+                                    </div>
+                     
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
 </div>
 
 
-<div style="margin-left:150px" class="modal fade" id="projectModal" tabindex="-1" aria-labelledby="projectModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <form id="projectForm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="projectModalLabel">➕ Thêm Dự án</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-                </div>
-                <div class="modal-body row">
-                    <input type="hidden" id="ProjectId" name="Id" />
 
-                    <div class="mb-5">
-                        <label for="Name" class="form-label fw-bold">Tên dự án</label>
-                        <input type="text" class="form-control" id="Name" name="Name" maxlength="255" required
-                               oninvalid="this.setCustomValidity('Vui lòng nhập tên dự án')"
-                               oninput="this.setCustomValidity('')" />
-                    </div>
-                    <div class="mb-5">
-                        <label for="Description" class="form-label fw-bold">Mô tả</label>
-                        <textarea class="form-control" id="Description" name="Description" rows="3"></textarea>
+<div class="modal fade" role="dialog" aria-modal="true" id="new-project-modal">
+    <div class="modal-dialog  modal-dialog-centered" role="document">
+        <form id="projectForm">
+        <div class="modal-content">
+       
+                <div class="modal-header d-block text-center pb-3 border-bttom">
+                    <h3 class="modal-title" id="projectModalLabel">➕ Thêm Dự án</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <input type="hidden" id="ProjectId" name="Id" />
+                        <div class="col-lg-12">
+                            <div class="form-group mb-3">
+                                <label for="Name" class="h5">Tên dự án *</label>
+                                <input type="text" class="form-control" id="Name" name="Name" maxlength="255" required
+                                       oninvalid="this.setCustomValidity('Vui lòng nhập tên dự án')"
+                                       oninput="this.setCustomValidity('')" />
+                            </div>
+                        </div>
+                  
+                        <div class="col-lg-12">
+                            <div class="form-group mb-3">
+                                <label for="exampleInputText004" class="h5">Mô tả</label>
+                                <textarea class="form-control" id="Description" name="Description" rows="3"></textarea>
+                            </div>
+                        </div>
+                  
+                        <div class="col-lg-12">
+                            <div class="d-flex flex-wrap align-items-ceter justify-content-center mt-2">
+                                <button type="submit" class="btn btn-primary mr-3" >Lưu</button>
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Huỷ</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Lưu</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                </div>
-            </div>
+        
+        </div>
         </form>
     </div>
 </div>
@@ -152,7 +260,7 @@
                         $('#Name').val(project.name);
                         $('#Description').val(project.description);
                         $('#projectModalLabel').text('✏️ Chỉnh sửa Dự án');
-                        $('#projectModal').modal('show');
+                        $('#new-project-modal').modal('show');
                     } else {
                         Swal.fire('Lỗi', res.error || 'Không thể lấy dữ liệu.', 'error');
                     }
@@ -169,7 +277,7 @@
             $('#Name').val('');
             $('#Description').val('');
             $('#projectModalLabel').text('➕ Thêm Dự án');
-            $('#projectModal').modal('show');
+            $('#new-project-modal').modal('show');
         }
         function confirmDelete(projectId) {
             Swal.fire({
@@ -208,6 +316,30 @@
                 }
             });
         }
-    </script>
 
+
+        $(document).ready(function () {            
+                $('#Search').on('submit', function (e) {
+                e.preventDefault();
+
+                const text = $('.search-input').val().trim();
+                let params = new URLSearchParams(window.location.search);
+
+                if (text) {
+                    params.set('textsearch', text);
+                } else {
+                    params.delete('textsearch');
+                }
+
+                let newUrl = '/Project/Index?' + params.toString();
+                window.location.href = newUrl;
+            });
+        });
+
+          $(document).ready(function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchText = urlParams.get('textsearch');
+            $('#searchtext').val(searchText);
+        });
+    </script>
 }
