@@ -26,6 +26,17 @@ namespace TaskManager.Models
             [Description("Cao")]
             High = 2
         }
+        public enum Role
+        {
+            [Description("User")]
+            User = 0,
+
+            [Description("Admin")]
+            Admin = 1,
+
+            [Description("Leader")]
+            Leader = 2
+        }
         public static string GetDescription(this Enum value)
         {
 

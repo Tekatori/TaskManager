@@ -26,6 +26,34 @@ namespace TaskManager.DAL
                 return pj;
             return new List<Project>();
         }
+        public List<Project> GetAllProjectByUser(int? pIdUser)
+        {
+            var user = _context.Users.FirstOrDefault(t => t.Id == pIdUser);
+            if (user != null)
+            {
+                if(user.TeamGroupId != null || user.TeamGroupId != 0)
+                {
+                    var pj = _context.Projects.Where(t => t.OwnerId == pIdUser || t.TeamGroupId == user.TeamGroupId).ToList();
+                    if (pj != null && pj.Count() > 0)
+                        return pj;
+                }
+                else
+                {
+                    var pj = _context.Projects.Where(t => t.OwnerId == pIdUser).ToList();
+                    if (pj != null && pj.Count() > 0)
+                        return pj;
+                }    
+            }    
+            return new List<Project>();
+        }
+        public List<Project> GetAllProjectByTeamGroup(int? pIdTeamGroup)
+        {
+            var pj = _context.Projects.Where(t => t.TeamGroupId == pIdTeamGroup).ToList();
+            if (pj != null && pj.Count() > 0)
+                return pj;
+            return new List<Project>();
+        }
+
         public Project GetProject(int pId)
         {
             var pj = _context.Projects.FirstOrDefault(x => x.Id == pId);
@@ -58,6 +86,7 @@ namespace TaskManager.DAL
             {
                 Pj.Name = pProject.Name;
                 Pj.Description = pProject.Description;
+                Pj.TeamGroupId = pProject.TeamGroupId;
             }
             else if (pIsDelete == true && Pj != null)
             {

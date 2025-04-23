@@ -1,23 +1,29 @@
 ﻿@model IEnumerable<TaskManager.Models.Project>
-
+@using TaskManager.Models;
 @{
     ViewData["Title"] = "Quản lý Dự án";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var lstteamGroup = ViewBag.lstteamGroup as List<TaskManager.Models.TeamGroup>;
+    if (lstteamGroup == null)
+    {
+        lstteamGroup = new List<TaskManager.Models.TeamGroup>();
+    }
+    var currentUser = CookieHelper.GetLoggedUser(User);
 }
 
 <style>
     .alert-info {
-        background-color: #e9f7fc;
-        color: #2c6e8f;
-        border-radius: 5px;
-        padding: 10px;
-        font-size: 16px;
+    background-color: #e9f7fc;
+    color: #2c6e8f;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 16px;
     }
 
-        .alert-info i {
-            font-size: 18px;
-            vertical-align: middle;
-        }
+    .alert-info i {
+    font-size: 18px;
+    vertical-align: middle;
+    }
 
 
 </style>
@@ -28,7 +34,7 @@
                 <div class="d-flex flex-wrap align-items-center justify-content-between breadcrumb-content">
                     <h5>📁 Danh sách Dự án</h5>
                     <div class="d-flex flex-wrap align-items-center justify-content-between">
-                      @*   <div class="dropdown status-dropdown mr-3">
+                        @*   <div class="dropdown status-dropdown mr-3">
                             <div class="dropdown-toggle" id="dropdownMenuButton03" data-toggle="dropdown">
                                 <div class="btn bg-body"><span class="h6">Status :</span> In Progress<i class="ri-arrow-down-s-line ml-2 mr-0"></i></div>
                             </div>
@@ -93,11 +99,11 @@
                     <div class="card card-block card-stretch card-height">
                         <div class="card-body">
                             <h5 class="mb-1">@project.Name</h5>
-                            <p class="mb-3">@project.Description <br />Ngày tạo: @project.CreatedAt?.ToString("dd/MM/yyyy")</p>
+                            <p class="mb-3">@project.Description <br />@{string loaiduan="Cá nhân";} @if(project.TeamGroupId != 0 && project.TeamGroupId != null) { loaiduan = "Nhóm"; } Loại Dự án : @loaiduan  <br />Ngày tạo: @project.CreatedAt?.ToString("dd/MM/yyyy")</p>
                             <div class="d-flex align-items-center justify-content-between pt-3 border-top">
                                 <a href="/Task/Index?IdProject=@project.Id"
-                                   class="btn btn-white text-info link-shadow"
-                                   title="Xem chi tiết dự án">
+                                class="btn btn-white text-info link-shadow"
+                                title="Xem chi tiết dự án">
                                     Chi tiết
                                 </a>
                                 <button class="btn btn-white text-warning link-shadow" onclick="openEditModal(@project.Id)">Sửa</button>
@@ -126,27 +132,27 @@
                 <div class="col-lg-6">
                     <div class="card">
                         <div class="card-body">
-                   
-                                     <div class="row">                                                                 
-                                        <div class="col-sm-8">
-                                            <div class="d-flex align-items-center">
-                                                <div class="ml-3">
-                                                    <h5 class="mb-1">@project.Name</h5>
-                                                    <p class="mb-0">@project.Description <br />Ngày tạo: @project.CreatedAt?.ToString("dd/MM/yyyy")</p>
-                                                </div>
-                                            </div>
+
+                            <div class="row">                                                                 
+                                <div class="col-sm-8">
+                                    <div class="d-flex align-items-center">
+                                        <div class="ml-3">
+                                            <h5 class="mb-1">@project.Name</h5>
+                                            <p class="mb-0">@project.Description <br />Ngày tạo: @project.CreatedAt?.ToString("dd/MM/yyyy")</p>
                                         </div>
-                                        <div class="col-sm-4 text-sm-right mt-3 mt-sm-0">
-                                            <a href="/Task/Index?IdProject=@project.Id"
-                                               class="btn btn-white text-info link-shadow"
-                                               title="Xem chi tiết dự án">
-                                                Chi tiết
-                                            </a>
-                                            <button class="btn btn-white text-warning link-shadow" onclick="openEditModal(@project.Id)">Sửa</button>
-                                            <button class="btn btn-white text-danger link-shadow" onclick="confirmDelete(@project.Id)">Xóa</button>
-                                        </div>        
                                     </div>
-                     
+                                </div>
+                                <div class="col-sm-4 text-sm-right mt-3 mt-sm-0">
+                                    <a href="/Task/Index?IdProject=@project.Id"
+                                    class="btn btn-white text-info link-shadow"
+                                    title="Xem chi tiết dự án">
+                                        Chi tiết
+                                    </a>
+                                    <button class="btn btn-white text-warning link-shadow" onclick="openEditModal(@project.Id)">Sửa</button>
+                                    <button class="btn btn-white text-danger link-shadow" onclick="confirmDelete(@project.Id)">Xóa</button>
+                                </div>        
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -160,34 +166,62 @@
 <div class="modal fade" role="dialog" aria-modal="true" id="new-project-modal">
     <div class="modal-dialog  modal-dialog-centered" role="document">
         <form id="projectForm">
-        <div class="modal-content">
-       
+            <div class="modal-content">
+
                 <div class="modal-header d-block text-center pb-3 border-bttom">
                     <h3 class="modal-title" id="projectModalLabel">➕ Thêm Dự án</h3>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <input type="hidden" id="ProjectId" name="Id" />
+                        <input type="hidden" id="OwnerId" name="OwnerId" />
                         <div class="col-lg-12">
                             <div class="form-group mb-3">
                                 <label for="Name" class="h5">Tên dự án *</label>
                                 <input type="text" class="form-control" id="Name" name="Name" maxlength="255" required
-                                       oninvalid="this.setCustomValidity('Vui lòng nhập tên dự án')"
-                                       oninput="this.setCustomValidity('')" />
+                                oninvalid="this.setCustomValidity('Vui lòng nhập tên dự án')"
+                                oninput="this.setCustomValidity('')" />
                             </div>
                         </div>
-                  
+
                         <div class="col-lg-12">
                             <div class="form-group mb-3">
-                                <label for="exampleInputText004" class="h5">Mô tả</label>
+                                <label for="Description" class="h5">Mô tả</label>
                                 <textarea class="form-control" id="Description" name="Description" rows="3"></textarea>
                             </div>
                         </div>
-                  
+                        @if (currentUser != null && (currentUser.Role == (int)CommonEnums.Role.Leader || currentUser.Role == (int)CommonEnums.Role.Admin))
+                        {
+                            <div class="col-lg-12">
+                                <label for="TeamGroupId" class="h5">Nhóm</label>
+                                <div class="dropdown bootstrap-select form-control">
+                                    <select id="TeamGroupId" name="TeamGroupId" class="form-control" data-style="py-0">
+                                        @{
+                                            <option value="" selected>-- Chọn nhóm --</option>
+                                            foreach(var teamg in lstteamGroup)
+                                            {
+                                                <option value="@teamg.Id">@teamg.Name</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-lg-12" hidden="true">
+                                <label for="TeamGroupId" class="h5">Nhóm</label>
+                                <div class="dropdown bootstrap-select form-control">
+                                    <select id="TeamGroupId" name="TeamGroupId" class="form-control" data-style="py-0">
+                                            <option value="" selected>-- Chọn nhóm --</option>                                      
+                                    </select>
+                                </div>
+                            </div>
+                        }           
                         <div class="col-lg-12">
                             <div class="d-flex flex-wrap align-items-ceter justify-content-center mt-2">
                                 <button type="submit" class="btn btn-primary mr-3" >Lưu</button>
-                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Huỷ</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
                             </div>
                         </div>
                     </div>
@@ -211,7 +245,9 @@
                 const data = {
                     Id: id,
                     Name: $('#Name').val(),
-                    Description: $('#Description').val()
+                    Description: $('#Description').val(),
+                    TeamGroupId : $('#TeamGroupId').val(),
+                    OwnerId : $('#OwnerId').val()
                 };
 
                 $.ajax({
@@ -255,10 +291,13 @@
                 success: function (res) {
                     if (res.success) {
                         const project = res.data;
+                        const cOwnerId = project.OwnerId ?? project.ownerId;
 
                         $('#ProjectId').val(project.id);
+                        $('#OwnerId').val(cOwnerId);
                         $('#Name').val(project.name);
                         $('#Description').val(project.description);
+                        $('#TeamGroupId').val(project.teamGroupId).selectpicker('refresh');
                         $('#projectModalLabel').text('✏️ Chỉnh sửa Dự án');
                         $('#new-project-modal').modal('show');
                     } else {
@@ -274,9 +313,11 @@
 
         function openAddModal() {
             $('#ProjectId').val('');
+            $('#OwnerId').val('');
             $('#Name').val('');
             $('#Description').val('');
             $('#projectModalLabel').text('➕ Thêm Dự án');
+            $('#TeamGroupId').val('').selectpicker('refresh');
             $('#new-project-modal').modal('show');
         }
         function confirmDelete(projectId) {

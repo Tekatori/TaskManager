@@ -18,6 +18,8 @@ namespace TaskManager.DAL
         public DbSet<User> Users { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Attachment> Attachments { get; set; }
+        public DbSet<TeamGroup> TeamGroup { get; set; }
+
     }
 
 }

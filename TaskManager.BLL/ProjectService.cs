@@ -23,6 +23,14 @@ namespace TaskManager.BLL
         {
             return _repo.GetAllProject();
         }
+        public List<Project> GetAllProjectByUser(int? pIdUser)
+        {
+            return _repo.GetAllProjectByUser(pIdUser);
+        }
+        public List<Project> GetAllProjectByTeamGroup(int? pIdTeamGroup)
+        {
+            return _repo.GetAllProjectByTeamGroup(pIdTeamGroup);
+        }
         public Project GetProject(int pId)
         {
             return _repo.GetProject(pId);

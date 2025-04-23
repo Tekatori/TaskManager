@@ -9,20 +9,35 @@ namespace TaskManager.Controllers
     public class ProjectController : Controller
     {
         private readonly ProjectService _projectService;
-
-        public ProjectController(ProjectService projectService)
+        private readonly UserService _userService ;
+        public ProjectController(ProjectService projectService, UserService userService)
         {
             _projectService = projectService;
+            _userService = userService;
         }
         public IActionResult Index(string textsearch = "")
         {
-            var projects = _projectService.GetAllProject();
-            if(!string.IsNullOrEmpty(textsearch))
+            var currentUser = CookieHelper.GetLoggedUser(User);
+            if (currentUser == null)
+                return RedirectToAction("Login", "User");
+
+            var projects = _projectService.GetAllProjectByUser(currentUser.Id);
+
+            if (!string.IsNullOrWhiteSpace(textsearch) && projects is not null)
             {
-                projects = projects.Where(p => p.Name != null && p.Name.ToLower().Contains(textsearch.ToLower())).ToList();
+                var filteredProjects = projects
+                .Where(p => p.Name is not null && p.Name.Contains(textsearch, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+                projects = filteredProjects;
             }
+            if(currentUser.Role ==(int)CommonEnums.Role.Admin || currentUser.Role == (int)CommonEnums.Role.Leader)
+            {
+                var lstteamGroup = _userService.GetALLTeamGroup();
+                ViewBag.lstteamGroup = lstteamGroup;
+            }         
             return View(projects);
         }
+
         [HttpPost]
         public JsonResult Create(Project project)
         {
@@ -49,9 +64,24 @@ namespace TaskManager.Controllers
             {
                 return Json(new { success = false, error = "Không tìm thấy dự án" });
             }
-            var res = _projectService.UpdateProject(project);
-            if (res > 0)
-                return Json(new { success = true });
+            var currentUser = CookieHelper.GetLoggedUser(User);
+            if (currentUser != null)
+            {
+                if (currentUser.Id == project.OwnerId || currentUser.Role == (int)CommonEnums.Role.Admin)
+                {
+                    var res = _projectService.UpdateProject(project);
+                    if (res > 0)
+                        return Json(new { success = true });
+                }
+                else
+                {
+                    return Json(new { success = false, error = "Bạn không có quyền sửa dự án" });
+                }
+            }
+            else
+            {
+                return Json(new { success = false, error = "Người dùng không hợp lệ" });
+            }    
             return Json(new { success = false, error = "Không có thay đổi" });
         }
         [HttpGet]
@@ -70,11 +100,33 @@ namespace TaskManager.Controllers
             {
                 return Json(new { success = false, error = "Không tìm thấy dự án" });
             }
+            var currentUser = CookieHelper.GetLoggedUser(User);
             Project pj = new Project();
             pj.Id = id;
-            var res = _projectService.DeleteProject(pj);
-            if (res > 0)
-                return Json(new { success = true });
+
+            var project = _projectService.GetProject(id);
+            if(currentUser != null)
+            {
+                if(project.TeamGroupId != null)
+                {
+                    if (project.OwnerId == currentUser.Id)
+                    {
+                        var res = _projectService.DeleteProject(pj);
+                        if (res > 0)
+                            return Json(new { success = true });
+                    }
+                    else
+                    {
+                        return Json(new { success = false, error = "Bạn không có quyền xoá dự án" });
+                    }
+                }
+                else
+                {
+                    var res = _projectService.DeleteProject(pj);
+                    if (res > 0)
+                        return Json(new { success = true });
+                }    
+            }     
             return Json(new { success = false, error = "Dự án đã tồn tại công việc không thể xoá" });
         }
     }

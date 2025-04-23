@@ -1,0 +1,444 @@
+﻿@model List<TaskManager.Models.TeamGroupViewModel>
+@{
+    ViewData["Title"] = "TeamGroup";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex flex-wrap align-items-center justify-content-between breadcrumb-content">
+                    <h5><i class="bi bi-people-fill mr-2"></i>Danh sách nhóm</h5>
+
+
+
+                    <div class="d-flex align-items-center">
+                        <div class="list-grid-toggle d-flex align-items-center mr-3">
+                            <div data-toggle-extra="tab" data-target-extra="#grid" class="active">
+                                <div class="grid-icon mr-3">
+                                    <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="7" height="7"></rect>
+                                        <rect x="14" y="3" width="7" height="7"></rect>
+                                        <rect x="14" y="14" width="7" height="7"></rect>
+                                        <rect x="3" y="14" width="7" height="7"></rect>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div data-toggle-extra="tab" data-target-extra="#list">
+                                <div class="grid-icon">
+                                    <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="21" y1="10" x2="3" y2="10"></line>
+                                        <line x1="21" y1="6" x2="3" y2="6"></line>
+                                        <line x1="21" y1="14" x2="3" y2="14"></line>
+                                        <line x1="21" y1="18" x2="3" y2="18"></line>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pl-3 border-left btn-new">
+                            <a title="Tạo nhóm" href="javascript:void(0)" class="btn btn-primary" data-target="#new-user-modal" data-toggle="modal"><i class="bi bi-plus-circle"></i> Tạo nhóm</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="grid" class="item-content animate__animated animate__fadeIn active" data-toggle-extra="tab-content">
+    <div class="row">
+        @if (!Model.Any())
+        {
+            <div class="col-lg-12 col-md-12">
+                <H3 class="text-center text-muted"><i class="ri-information-line mr-2"></i> Không tìm thấy nhóm</H3>
+            </div>
+        }
+        else
+        {
+            @foreach (var team in Model)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="card-transparent card-block card-stretch card-height">
+                        <div class="card-body text-center p-0">
+                            <div class="item">
+                                <div class="odr-img">
+                                    <img src="/img/11539820.png" class="img-fluid rounded-circle avatar-90 m-auto" alt="image">
+                                </div>
+                                <div class="odr-content rounded">
+                                    <h4 class="mb-2">@team.Name</h4>
+                                    <p class="mb-3">Leader: @team.CreatedByName</p>
+                                    <ul class="list-unstyled mb-3">
+                                        <li class="bg-secondary-light rounded-circle iq-card-icon-small mr-4"> <a title="Chi tiết" href="javascript:void(0)" onclick="showTeamDesc('@team.Name', `@team.Description`)"> <i class="ri-file-text-line m-0"></i> </a> </li>
+                                        <li class="bg-primary-light rounded-circle iq-card-icon-small mr-4"> <a title="Danh sách thành viên" href="javascript:void(0)" onclick="showTeamMembers('@team.Id')"> <i class="ri-group-line m-0"></i></a> </li>
+                                        <li class="bg-success-light rounded-circle iq-card-icon-small mr-4"><a title="Thêm thành viên" href="javascript:void(0)" onclick="openAddMemberModal('@team.Id')">  <i class="ri-user-add-line m-0"></i>  </a></li>
+                                        <li class="bg-danger-light rounded-circle iq-card-icon-small">
+                                            <a title="Xoá nhóm" href="javascript:void(0)" onclick="confirmDelete('@team.Id')">
+                                                <i class="ri-delete-bin-line m-0"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                   @*  <div class="pt-3 border-top">
+                                        <a href="#" class="btn btn-primary"><i class="bi bi-plus-circle"></i>Thêm thành viên</a>
+                                    </div> *@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+    </div>
+</div>
+<div id="list" class="item-content animate__animated animate__fadeIn" data-toggle-extra="tab-content">
+    <div class="table-responsive rounded bg-white mb-4">
+        <table class="table mb-0 table-borderless tbl-server-info">
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            <H3 class="text-center text-muted"><i class="ri-information-line mr-2"></i> Không tìm thấy nhóm</H3>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var team in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="media align-items-center">
+                                    <img src="/img/11539820.png" class="img-fluid rounded-circle avatar-40" alt="image">
+                                    <h5 class="ml-3">@team.Name</h5>
+                                </div>
+                            </td>
+                            <td>Leader: @team.CreatedByName</td>
+                           @*  <td>
+                                <a href="#" class="btn btn-primary"><i class="bi bi-plus-circle"></i>Thêm thành viên</a>
+                            </td> *@
+                            <td>
+                                <div class="media align-items-center">
+                                    <a title="Chi tiết" href="javascript:void(0)" onclick="showTeamDesc('@team.Name', `@team.Description`)" class="bg-secondary-light rounded-circle iq-card-icon-small mr-3"><i class="ri-file-text-line m-0"></i></a>
+                                    <a title="Danh sách thành viên" href="javascript:void(0)" onclick="showTeamMembers('@team.Id')" class="bg-primary-light rounded-circle iq-card-icon-small mr-3"><i class="ri-group-line m-0"></i></a>
+                                    <a title="Thêm thành viên" href="javascript:void(0)" onclick="openAddMemberModal('@team.Id')" class="bg-success-light rounded-circle iq-card-icon-small mr-3"><i class="ri-user-add-line m-0"></i></a>
+                                    <a title="Xoá nhóm" href="javascript:void(0)" onclick="confirmDelete('@team.Id')" class="bg-success-light rounded-circle iq-card-icon-small"><i class="ri-delete-bin-line m-0"></i></a>
+                                </div>
+                            </td>
+                      
+                           
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade bd-example-modal-lg" role="dialog" aria-modal="true" id="new-user-modal">
+	<div class="modal-dialog  modal-dialog-centered modal-lg" role="document">
+		<form id="teamGroupForm">
+			<div class="modal-content">
+				<div class="modal-header d-block text-center pb-3 border-bttom">
+                    <h3 class="modal-title" id="exampleModalCenterTitle02">➕ Tạo nhóm</h3>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="form-group mb-3">
+								<label for="Name" class="h5">Tên nhóm *</label>
+								<input type="text" class="form-control" id="Name" name="Name" maxlength="255" required
+									   oninvalid="this.setCustomValidity('Vui lòng nhập tên nhóm')"
+									   oninput="this.setCustomValidity('')" />
+							</div>
+						</div>
+
+						<div class="col-lg-12">
+							<div class="form-group mb-3">
+                                <label for="Description" class="h5">Mô tả</label>
+								<textarea class="form-control" id="Description" name="Description" rows="3"></textarea>
+							</div>
+						</div>
+
+
+						<div class="col-lg-12">
+							<div class="d-flex flex-wrap align-items-ceter justify-content-center mt-2">
+								<button type="submit" class="btn btn-primary mr-3">Lưu</button>
+                                <div class="btn btn-secondary" data-dismiss="modal">Huỷ</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+
+<div class="modal fade" id="teamDescModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="teamModalTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="teamModalBody" style="max-height: 300px; overflow-y: auto;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addMemberModal" tabindex="-1" role="dialog" aria-labelledby="addMemberLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addMemberLabel">Thêm thành viên vào nhóm</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Đóng" onclick="$('#addMemberModal').modal('hide');">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="selectedTeamId" />
+
+   
+                <input type="text" id="searchUser" class="form-control mb-3" placeholder="Tìm kiếm thành viên..." oninput="searchUserList()">
+
+                <ul id="user-list" class="list-group" style="max-height: 600px; overflow-y: auto; margin-bottom: 1rem;">
+
+                </ul>
+
+                <button class="btn btn-primary btn-block" onclick="addSelectedUsers()">➕ Thêm thành viên đã chọn</button>
+              
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="teamMembersModal" tabindex="-1" role="dialog" aria-labelledby="teamMembersLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="teamMembersLabel">Danh sách thành viên</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Đóng" onclick="$('#teamMembersModal').modal('hide');">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul id="team-members-list" class="list-group" style="max-height: 600px; overflow-y: auto; margin-bottom: 1rem;"></ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+            $('#teamGroupForm').submit(function (e) {
+                e.preventDefault();
+
+                var title = $('#Name').val().trim();
+
+                if (!title) {
+                    Swal.fire('Thiếu thông tin', 'Vui lòng nhập tên nhóm.', 'warning');
+                    return;
+                }          
+
+                var data = $(this).serialize();
+
+                $.post('/User/CreateTeamGroup', data, function (res) {
+                    if (res.success) {
+                        Swal.fire('Thành công!', 'Đã thêm nhóm.', 'success')
+                            .then(() => location.reload());
+                    } else {
+                        Swal.fire('Lỗi', res.error || 'Không thể thêm', 'error');
+                    }
+                });
+            });     
+        });
+
+        function showTeamDesc(title, desc) {
+            $('#teamModalTitle').text("Mô tả nhóm: " + title);
+            $('#teamModalBody').html(desc);
+            var modal = new bootstrap.Modal(document.getElementById('teamDescModal'));
+            modal.show();
+        }
+
+        function confirmDelete(GroupId) {
+            Swal.fire({
+                title: 'Bạn có chắc muốn xóa?',
+                text: "Hành động này không thể hoàn tác!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/User/DeleteTeamGroup',
+                        type: 'POST',
+                        data: { Id: GroupId },
+                        success: function (res) {
+                            if (res.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Đã xóa nhóm!',
+                                    timer: 1000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Lỗi', res.error || 'Không thể xóa.', 'error');
+                            }
+                        },
+                        error: function () {
+                            Swal.fire('Lỗi', 'Không thể kết nối server.', 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        function openAddMemberModal(teamId) {
+            $('#selectedTeamId').val(teamId);
+
+            $.ajax({
+                url: '/User/GetUsersNotForTeam',
+                type: 'GET',
+                data: { teamId: teamId },
+                success: function (res) {
+                    if (res.success) {
+                        let html = '';
+                        res.users.forEach(user => {
+                            const userId = user.Id ?? user.id;
+                            const username = user.Username ?? user.username ?? 'Không rõ';
+                            const email = user.Email ?? user.email ?? 'Không rõ';
+
+                            html += `
+                                <li class="list-group-item" style="padding-left: 1.5rem;" data-username="${username}" data-email="${email}">
+                                    <label for="user-${userId}" class="form-check-label d-flex align-items-center mb-0" style="cursor: pointer;">
+                                        <input class="form-check-input me-3" type="checkbox"
+                                               value="${userId}" id="user-${userId}"
+                                               style="width: 18px; height: 18px;">
+                                        <span style="font-size: 16px;">${username} (${email})</span>
+                                    </label>
+                                </li>`;
+                        });
+
+                        $('#user-list').html(html);
+                        $('#addMemberModal').modal('show');
+                    } else {
+                        Swal.fire('Lỗi', res.message || 'Không thể tải người dùng.', 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Lỗi', 'Không thể kết nối đến máy chủ.', 'error');
+                }
+            });
+        }
+
+ 
+        function searchUserList() {
+            const searchTerm = $('#searchUser').val().toLowerCase();
+
+            $('#user-list li').each(function() {
+                const username = $(this).data('username') ? $(this).data('username').toLowerCase() : '';
+                const email = $(this).data('email') ? $(this).data('email').toLowerCase() : '';
+
+                if (username.includes(searchTerm) || email.includes(searchTerm)) {
+                    $(this).show(); 
+                } else {
+                    $(this).hide(); 
+                }
+            });
+        }
+
+
+
+        function addSelectedUsers() {
+            const teamId = $('#selectedTeamId').val();
+            const selectedUserIds = [];
+
+            $('#user-list input[type="checkbox"]:checked').each(function () {
+                selectedUserIds.push(parseInt($(this).val()));
+            });
+
+            if (selectedUserIds.length === 0) {
+                Swal.fire('Chưa chọn ai', 'Vui lòng chọn ít nhất một người dùng.', 'warning');
+                return;
+            }
+
+            $.ajax({
+                url: '/User/AddUsersToTeam',
+                type: 'POST',
+                traditional: true, // để gửi array đúng cách
+                data: { teamId: teamId, userIds: selectedUserIds },
+                success: function (res) {
+                    if (res.success) {
+                        Swal.fire('Thành công', 'Đã thêm các thành viên.', 'success');
+                        $('#addMemberModal').modal('hide');
+                    } else {
+                        Swal.fire('Lỗi', res.message || 'Không thể thêm thành viên.', 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Lỗi', 'Không thể kết nối đến máy chủ.', 'error');
+                }
+            });
+        }
+
+        function showTeamMembers(teamId) {
+            $.ajax({
+                url: '/User/GetUsersForTeam', 
+                type: 'GET',
+                data: { teamId: teamId },
+                success: function (res) {
+                    if (res.success) {
+                        let html = '';
+                        res.users.forEach(user => {
+                            const username = user.Username ?? user.username ?? 'Không rõ';
+                            const email = user.Email ?? user.email ?? 'Không rõ';
+                            html += `
+                                <li class="list-group-item">
+                                    <span>${username} (${email})</span>
+                                </li>`;
+                        });
+                        $('#team-members-list').html(html);
+                        $('#teamMembersModal').modal('show'); // Hiển thị modal
+                    } else {
+                        Swal.fire('Lỗi', res.message || 'Không thể tải thành viên.', 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Lỗi', 'Không thể kết nối đến máy chủ.', 'error');
+                }
+            });
+        }
+
+
+    </script>
+
+
+}

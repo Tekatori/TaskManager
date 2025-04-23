@@ -42,7 +42,8 @@ namespace TaskManager.Models
             {
                 Id = int.TryParse(user.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : null,
                 UserName = user.FindFirstValue(ClaimTypes.Name) ?? string.Empty,
-                Email = user.FindFirstValue(ClaimTypes.Email) ?? string.Empty
+                Email = user.FindFirstValue(ClaimTypes.Email) ?? string.Empty,
+                Role = int.TryParse(user.FindFirstValue(ClaimTypes.Role), out var Role) ? Role : null,
             };
         }
     }
@@ -51,5 +52,6 @@ namespace TaskManager.Models
         public string UserName { get; set; } = string.Empty;
         public int? Id { get; set; }
         public string Email { get; set; } = string.Empty;
+        public int? Role { get; set; }
     }
 }

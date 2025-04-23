@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using TaskManager.DAL;
 using TaskManager.Models;
 
@@ -43,6 +44,26 @@ namespace TaskManager.BLL
         {
             return _repo.isExitUserName(pUserName);
         }
+        public List<TeamGroup> GetALLTeamGroup()
+        {
+            return _repo.GetALLTeamGroup();
+        }
+        public TeamGroup GetTeamGroup(int pId)
+        {
+            return _repo.GetTeamGroup(pId);
+        }
+        public bool isExitTeamGroup(string pName)
+        {
+            return _repo.isExitTeamGroup(pName);
+        }
+        public List<User> GetUserByTeamGroupId(int pTeamGroupId)
+        {
+            return _repo.GetUserByTeamGroupId(pTeamGroupId);
+        }
+        public List<User> GetUsersExcludingTeamGroupId(int pTeamGroupId)
+        {
+            return _repo.GetUsersExcludingTeamGroupId(pTeamGroupId);
+        }
         #endregion
 
         #region CRUD
@@ -58,7 +79,22 @@ namespace TaskManager.BLL
         {
             return _repo.DeleteUser(pUser);
         }
-
+        public int CreateTeamGroup(TeamGroup pTeamGroup)
+        {
+            return _repo.CreateTeamGroup(pTeamGroup);
+        }
+        public int UpdateTeamGroup(TeamGroup pTeamGroup)
+        {
+            return _repo.UpdateTeamGroup(pTeamGroup);
+        }
+        public int DeleteTeamGroup(TeamGroup pTeamGroup)
+        {
+            return _repo.DeleteTeamGroup(pTeamGroup);
+        }
+        public int AddUsertoTeamGroup(int pUserId, int pTeamGroupId)
+        {
+            return _repo.AddUsertoTeamGroup(pUserId, pTeamGroupId);
+        }
         #endregion
     }
 }

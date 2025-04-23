@@ -57,7 +57,8 @@ namespace TaskManager.Controllers
                     {
                         new Claim(ClaimTypes.NameIdentifier, us.Id.ToString()),
                         new Claim(ClaimTypes.Name, us.Username),
-                        new Claim(ClaimTypes.Email, us.Email ?? "")
+                        new Claim(ClaimTypes.Email, us.Email ?? ""),
+                        new Claim(ClaimTypes.Role, us.Role?.ToString() ?? "0")
                     };
 
                     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -124,6 +125,117 @@ namespace TaskManager.Controllers
             return RedirectToAction("Login", "User");
         }
 
+        public IActionResult TeamGroup()
+        {
+            var lstTeamGroup = _userService.GetALLTeamGroup();
+
+            var viewmodel = new List<TeamGroupViewModel>();
+            if (lstTeamGroup != null && lstTeamGroup.Count > 0)
+            {
+               
+                foreach (var item in lstTeamGroup)
+                {
+                    var user = _userService.GetUser(item.CreatedBy ?? 0);
+                    if (user != null)
+                    {
+                        viewmodel.Add(new TeamGroupViewModel
+                        {
+                            Id = item.Id,
+                            Name = item.Name,
+                            Description = item.Description,
+                            CreatedAt = item.CreatedAt,
+                            CreatedBy = item.CreatedBy,
+                            CreatedByName = user.Username
+                        });
+                    }
+                }
+            }
+            var lstUser = _userService.GetAllUser();
+            ViewBag.lstUser = lstUser;
+            return View(viewmodel);
+        }
+        [HttpPost]
+        public IActionResult CreateTeamGroup(TeamGroup teamGroup)
+        {
+            if (IsTextNull(teamGroup.Name))
+                return Json(new { error = "Tên nhóm không được trống" });
+            if (_userService.isExitTeamGroup(teamGroup.Name))
+                return Json(new { error = "Tên nhóm đã tồn tại" });
+            var currentUser = CookieHelper.GetLoggedUser(User);
+            if (currentUser == null)
+                return Json(new { error = "Người dùng không hợp lệ" });
+          
+            teamGroup.CreatedAt = DateTime.Now;
+            teamGroup.CreatedBy = currentUser.Id;
+            var res = _userService.CreateTeamGroup(teamGroup);
+            if (res > 0)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { error = "Tạo nhóm thất bại" });
+        }
+        [HttpPost]
+        public IActionResult DeleteTeamGroup(TeamGroup teamGroup)
+        {
+            if (teamGroup.Id <= 0 || teamGroup == null)
+            {
+                return Json(new { success = false, error = "Không tìm thấy nhóm" });
+            }
+
+            var group = _userService.GetTeamGroup(teamGroup.Id);
+            if (group == null)
+                return Json(new { success = false, error = "Không tìm thấy nhóm" });
+
+            var res = _userService.DeleteTeamGroup(group);
+            if (res > 0)
+                return Json(new { success = true });
+            return Json(new { success = false, error = "Xoá thất bại" });
+        }
+        [HttpPost]
+        public JsonResult AddUsersToTeam(int teamId, List<int> userIds)
+        {
+            try
+            {
+                int res= 0;
+                foreach (var userId in userIds)
+                {
+                    res = _userService.AddUsertoTeamGroup(userId, teamId);
+                }
+                if(res > 0)
+                    return Json(new { success = true });
+                else
+                    return Json(new { success = false, message = "Thêm người dùng vào nhóm thất bại" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        public ActionResult GetUsersNotForTeam(int teamId)
+        {
+            try
+            {
+                var users = _userService.GetUsersExcludingTeamGroupId(teamId); 
+                return Json(new { success = true, users = users });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        public ActionResult GetUsersForTeam(int teamId)
+        {
+            try
+            {
+                var users = _userService.GetUserByTeamGroupId(teamId);
+                return Json(new { success = true, users = users });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
         #region Private
         private bool IsTextNull(string text)
         {

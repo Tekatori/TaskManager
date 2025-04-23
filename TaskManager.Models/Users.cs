@@ -14,6 +14,7 @@ namespace TaskManager.Models
         public string Email { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
         public int? Role { get; set; } = 0;
+        public int? TeamGroupId { get; set; } = 0;
         public DateTime? CreatedAt { get; set; }
     }
 }
