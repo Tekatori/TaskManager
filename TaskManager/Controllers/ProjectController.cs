@@ -37,6 +37,43 @@ namespace TaskManager.Controllers
             }         
             return View(projects);
         }
+        [HttpPost]
+        public JsonResult GetAssignedName(int? pIdProject)
+        {
+            if (!pIdProject.HasValue)
+            {
+                return Json(new { success = false, error = "có lỗi xảy ra" });
+            }
+            string AssignedName = "";
+            var project = _projectService.GetProject(pIdProject.Value);
+            if(project != null)
+            {
+                if (project.TeamGroupId.HasValue)
+                {
+                    var teamgroup = _userService.GetTeamGroup(project.TeamGroupId.Value);
+                    if (teamgroup != null)
+                    {
+                        AssignedName =teamgroup.Name +" (Nhóm)";
+                    }
+                }
+                else 
+                {
+                    if (project.OwnerId.HasValue)
+                    {
+                        var user = _userService.GetUser(project.OwnerId.Value);
+                        if(user != null)
+                        {
+                            AssignedName = user.Username + " (cá nhân)"; ;
+                        }    
+                    }
+                }
+            }
+            else
+            {
+                return Json(new { success = false, error = "có lỗi xảy ra" });
+            }
+            return Json(new { success = true, data = AssignedName });
+        }
 
         [HttpPost]
         public JsonResult Create(Project project)

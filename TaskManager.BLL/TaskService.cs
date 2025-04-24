@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using TaskManager.DAL;
+using TaskManager.DAL.ViewModel;
 using TaskManager.Models;
 
 namespace TaskManager.BLL
@@ -23,6 +24,14 @@ namespace TaskManager.BLL
         {
             return _repo.GetAllTask();
         }
+        public List<TaskItem> GetAllTaskNotDone(int? pIdUser)
+        {
+            return _repo.GetAllTaskNotDone(pIdUser);
+        }
+        public List<TaskItem> GetAllTaskByIdStatus(int? pIdStatus)
+        {
+            return _repo.GetAllTaskByIdStatus(pIdStatus);
+        }
         public TaskItem GetTask(int? pId)
         {
             return _repo.GetTask(pId);
@@ -34,6 +43,10 @@ namespace TaskManager.BLL
         public string GetProjectName(int? pIdProject)
         {
             return _repo.GetProjectName(pIdProject);
+        }
+        public List<TaskItem> GetListTask(TaskParam param)
+        {
+            return _repo.GetListTask(param);
         }
         #endregion
 

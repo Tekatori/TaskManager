@@ -1,4 +1,5 @@
-﻿@model List<TaskManager.Models.TeamGroupViewModel>
+﻿@using TaskManager.DAL.ViewModel
+@model List<TeamGroupViewModel>
 @{
     ViewData["Title"] = "TeamGroup";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -267,8 +268,15 @@
 
                 $.post('/User/CreateTeamGroup', data, function (res) {
                     if (res.success) {
-                        Swal.fire('Thành công!', 'Đã thêm nhóm.', 'success')
-                            .then(() => location.reload());
+                         Swal.fire({
+                                    icon: 'success',
+                                    title:'Đã thêm nhóm',
+                                    text: 'Trang sẽ tự làm mới...',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
                     } else {
                         Swal.fire('Lỗi', res.error || 'Không thể thêm', 'error');
                     }
@@ -393,11 +401,20 @@
             $.ajax({
                 url: '/User/AddUsersToTeam',
                 type: 'POST',
-                traditional: true, // để gửi array đúng cách
+                traditional: true, 
                 data: { teamId: teamId, userIds: selectedUserIds },
                 success: function (res) {
                     if (res.success) {
-                        Swal.fire('Thành công', 'Đã thêm các thành viên.', 'success');
+                        Swal.fire({
+                                    icon: 'success',
+                                    title:'Đã thêm các thành viên',
+                                    text: 'Trang sẽ tự làm mới...',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+
                         $('#addMemberModal').modal('hide');
                     } else {
                         Swal.fire('Lỗi', res.message || 'Không thể thêm thành viên.', 'error');

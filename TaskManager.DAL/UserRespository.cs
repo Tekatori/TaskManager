@@ -83,7 +83,7 @@ namespace TaskManager.DAL
         }
         public List<User> GetUsersExcludingTeamGroupId(int pTeamGroupId)
         {
-            var us = _context.Users.Where(x => x.TeamGroupId != pTeamGroupId).ToList();
+            var us = _context.Users.Where(x => x.TeamGroupId != pTeamGroupId && (!x.TeamGroupId.HasValue || x.TeamGroupId == 0)).ToList();
             if (us != null && us.Count() > 0)
                 return us;
             return new List<User>();

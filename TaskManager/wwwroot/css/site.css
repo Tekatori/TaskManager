@@ -735,3 +735,8 @@
     border-radius: 4px;
 }
 
+.bootstrap-select .dropdown-toggle:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 0.15rem rgba(0, 123, 255, 0.15) !important; /* vi?n xanh nh?t */
+    border-color: #80bdff !important;
+}

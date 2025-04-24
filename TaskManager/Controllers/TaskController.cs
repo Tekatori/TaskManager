@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TaskManager.BLL;
 using TaskManager.Models;
-
+using TaskManager.DAL.ViewModel;
 namespace TaskManager.Controllers
 {
     public class TaskController : Controller
@@ -9,32 +9,63 @@ namespace TaskManager.Controllers
 
         private readonly TaskService _taskService;
         private readonly ProjectService _projectService;
+        private readonly UserService _userService;
 
-        public TaskController(TaskService taskService, ProjectService projectService)
+        public TaskController(TaskService taskService, ProjectService projectService, UserService userService)
         {
             _taskService = taskService;
             _projectService = projectService;
+            _userService = userService;
         }
         public IActionResult Index(TaskParam param)
         {
-            var lstProjectName = _projectService.GetAllProject();
+            var currentUser = CookieHelper.GetLoggedUser(User);
+            if (currentUser == null)
+                return RedirectToAction("Login", "User");
+
+            var lstProjectName = _projectService.GetAllProjectByUser(currentUser.Id);
             ViewBag.ListProject = lstProjectName;
 
-            var lsttask = new List<TaskItem>();
 
-            if(param.IdProject != 0)
-            {
-                lsttask = _taskService.GetAllTaskInProject(param.IdProject);
-            }
-            else
-            {
-                lsttask = _taskService.GetAllTask();
-            }
-            if(!string.IsNullOrEmpty(param.textsearch))
-            {
-                lsttask = lsttask.Where(t => t.Title != null && t.Title.ToLower().Contains(param.textsearch.ToLower())).ToList();
-            }    
+            var lsttask = _taskService.GetAllTaskNotDone(currentUser.Id);
             return View(lsttask);
+        }
+        [HttpGet]
+        public IActionResult FilterTask(TaskParam param)
+        {
+            var currentUser = CookieHelper.GetLoggedUser(User);
+            if (currentUser == null)
+                return RedirectToAction("Login", "User");
+            param.IdUser = currentUser.Id;
+
+            var lstProjectName = _projectService.GetAllProjectByUser(currentUser.Id);
+            ViewBag.ListProject = lstProjectName;
+
+            var lsttask = _taskService.GetListTask(param);
+            return PartialView("_TaskListPartial", lsttask);
+        }
+        [HttpGet]
+        public IActionResult GetTeamGroupByIdProject(int? pIdProject)
+        {
+            if(pIdProject.HasValue)
+            {
+                var currentUser = CookieHelper.GetLoggedUser(User);
+                var project = _projectService.GetProject(pIdProject.Value);
+                if (project != null && project.TeamGroupId.HasValue)
+                {
+                    var lstUser = _userService.GetUserByTeamGroupId(project.TeamGroupId.Value);
+                    if (lstUser != null && currentUser != null)
+                    {
+                        lstUser = lstUser.Where(t=>t.Id != currentUser.Id).ToList();
+                    }
+                    return Json(new { success = true, data = lstUser });
+                }
+                else
+                {
+                    return Json(new { success = false, error = "Có lỗi xảy ra" });
+                }
+            }
+            return Json(new { success = false, error = "Có lỗi xảy ra" });
         }
         [HttpPost]
         public JsonResult Create(TaskItem taskItem)
@@ -45,7 +76,11 @@ namespace TaskManager.Controllers
             }
             var currentUser = CookieHelper.GetLoggedUser(User);
             taskItem.CreatedAt = DateTime.Now;
-            taskItem.AssignedTo = currentUser != null ? currentUser.Id : null;
+
+            if (!taskItem.AssignedTo.HasValue || taskItem.AssignedTo == 0)
+            {
+                taskItem.AssignedTo = currentUser != null ? currentUser.Id : null;
+            }
             var res = _taskService.CreateTask(taskItem);
             if (res > 0)
                 return Json(new { success = true });
@@ -89,6 +124,8 @@ namespace TaskManager.Controllers
             {
                 return Json(new { success = false, error = "Không tìm thấy công việc" });
             }
+            var currentUser = CookieHelper.GetLoggedUser(User);
+
 
             var task = _taskService.GetTask(id);
             if (task == null)
@@ -102,8 +139,14 @@ namespace TaskManager.Controllers
             {
                 return Json(new { success = false, error = "Không thể xóa công việc đã hoàn thành." });
             }
-
-
+            if(currentUser != null && task.ProjectId.HasValue)
+            {
+                var project = _projectService.GetProject(task.ProjectId.Value);
+                if(project != null && project.OwnerId != currentUser.Id && currentUser.Id != (int)CommonEnums.Role.Admin)
+                {
+                    return Json(new { success = false, error = "Bạn không có quyền xóa công việc này." });
+                }       
+            }
 
             var res = _taskService.DeleteTask(task);
             if (res > 0)

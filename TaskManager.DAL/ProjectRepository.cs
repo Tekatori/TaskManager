@@ -31,7 +31,7 @@ namespace TaskManager.DAL
             var user = _context.Users.FirstOrDefault(t => t.Id == pIdUser);
             if (user != null)
             {
-                if(user.TeamGroupId != null || user.TeamGroupId != 0)
+                if(user.TeamGroupId != null && user.TeamGroupId != 0)
                 {
                     var pj = _context.Projects.Where(t => t.OwnerId == pIdUser || t.TeamGroupId == user.TeamGroupId).ToList();
                     if (pj != null && pj.Count() > 0)

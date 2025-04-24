@@ -1,0 +1,203 @@
+﻿@model List<TaskManager.Models.TaskItem>
+@using TaskManager.Models;
+
+<div class="row">
+	@if (Model != null && Model.Count > 0)
+	{
+		foreach (var task in Model)
+		{
+			<div class="col-lg-12 task-item" data-status="@task.Status">
+				<div class="card card-widget task-card">
+					<div class="card-body">
+						<div class="d-flex flex-wrap align-items-center justify-content-between">
+							<div class="d-flex align-items-center">
+								<div>
+									@{
+										string icon = "🆕";
+
+										if (task.Status == 1)
+										{
+											icon = "⚙️";
+										}
+										else if (task.Status == 2)
+										{
+											icon = "✅";
+										}
+									}
+
+									<h5 class="mb-2">
+										@icon @task.Title
+
+									</h5>
+
+								</div>
+							</div>
+							<div class="media align-items-center mt-md-0 mt-3">
+
+								<a title="Xem chi tiết" class="btn bg-primary-light mr-3" data-toggle="collapse" href="#collapseEdit1-@task.Id" role="button" aria-expanded="false" aria-controls="collapseEdit1-@task.Id">🔍</a>
+
+								<a title="Cập nhật trạng thái" onclick="openEditModal('@task.Id')" class="btn bg-success-light mr-3">
+									<i class="bi bi-pencil-square"></i>
+								</a>
+								<a href="#" onclick="event.stopPropagation(); confirmDelete('@task.Id')" class="btn bg-secondary-light" data-bs-toggle="tooltip" title="Xóa">
+									<i class="bi bi-trash"></i>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="collapse" id="collapseEdit1-@task.Id">
+					<div class="card card-list task-card">
+						<div class="card-header d-flex align-items-center justify-content-between px-0 mx-3">
+							<div class="header-title">
+								<label class="control-label h5" for="customCheck05"> <i class="bi bi-card-checklist mr-2"></i>Chi tiết công việc</label>
+
+							</div>
+						</div>
+						<div class="card-body">
+							<div class="card mb-3">
+								<div class="card-body">
+									<div class="row">
+										<div class="col-lg-12">
+											<div class="form-group mb-0">
+												<label for="ProjectId-@task.Id" class="h5">Dự án</label>
+												<select name="ProjectId-@task.Id" class="form-control" data-style="py-0" disabled>
+													@{
+														foreach (var project in ViewBag.ListProject)
+														{
+															<option value="@project.Id">@project.Name</option>
+														}
+													}
+
+												</select>
+											</div>
+										</div>
+
+									</div>
+								</div>
+							</div>
+							<div class="card mb-3">
+								<div class="card-body">
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group mb-0">
+												<label for="Priority-@task.Id" class="h5">Độ ưu tiên</label>
+												<select id="Priority-@task.Id" name="Priority-@task.Id" class="form-control" data-style="py-0" disabled>
+													@if (task.Priority == (int)CommonEnums.TaskPriority.Low)
+													{
+														<option value="@CommonEnums.TaskPriority.Low">@CommonEnums.GetDescription(CommonEnums.TaskPriority.Low)</option>
+													}
+													else if (task.Priority == 2)
+													{
+														<option value="@CommonEnums.TaskPriority.High">@CommonEnums.GetDescription(CommonEnums.TaskPriority.High)</option>
+													}
+													else
+													{
+														<option value="@CommonEnums.TaskPriority.Medium">@CommonEnums.GetDescription(CommonEnums.TaskPriority.Medium)</option>
+													}
+												</select>
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="form-group mb-0">
+												<label for="DueDate-@task.Id" class="h5">Hạn chót</label>
+												<input disabled type="date" class="form-control" id="DueDate-@task.Id"
+													   value="@(task.DueDate.HasValue ? task.DueDate.Value.ToString("yyyy-MM-dd") : "")" />
+
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card mb-3">
+								<div class="card-body">
+									<div class="row">
+										<div class="col-lg-4">
+											<div class="form-group mb-0">
+												<label for="Status-@task.Id" class="h5">Trạng thái</label>
+												<select id="Status-@task.Id" name="Status-@task.Id" class="form-control" data-style="py-0" disabled>
+													@if (task.Status == (int)CommonEnums.TaskStatus.InProgress)
+													{
+														<option value="@CommonEnums.TaskStatus.InProgress">@CommonEnums.GetDescription(CommonEnums.TaskStatus.InProgress)</option>
+													}
+													else if (task.Status == (int)CommonEnums.TaskStatus.Completed)
+													{
+														<option value="@CommonEnums.TaskStatus.Completed">@CommonEnums.GetDescription(CommonEnums.TaskStatus.Completed)</option>
+													}
+													else
+													{
+														<option value="@CommonEnums.TaskStatus.New" selected>@CommonEnums.GetDescription(CommonEnums.TaskStatus.New)</option>
+													}
+												</select>
+											</div>
+										</div>
+										<div class="col-lg-4">
+											<div class="form-group mb-0">
+												<label for="CreatedAt-@task.Id" class="h5">Ngày tạo</label>
+												<input disabled type="date" class="form-control" id="CreatedAt-@task.Id"
+													   value="@(task.CreatedAt.HasValue ? task.CreatedAt.Value.ToString("yyyy-MM-dd") : "")" />
+											</div>
+										</div>
+										<div class="col-lg-4">
+											<div class="form-group mb-0">
+												<label for="UpdatedAt-@task.Id" class="h5">Ngày cập nhật</label>
+												<input disabled type="date" class="form-control" id="UpdatedAt-@task.Id"
+													   value="@(task.UpdatedAt.HasValue ? task.UpdatedAt.Value.ToString("yyyy-MM-dd") : "")" />
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="card mb-3">
+								<div class="card-body">
+									<div class="row">
+										<div class="col-lg-12">
+											<h5 class="mb-2">Mô tả</h5>
+											<p class="mb-0">@task.Description</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card mb-3">
+								<div class="card-body">
+									<div class="row">
+										<div class="col-lg-12">
+											<h5 class="mb-2">Ghi chú</h5>
+											<p class="mb-0">@task.Notes</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							@*    <div class="card mb-3">
+                                                <div class="card-body">
+                                                    <div class="row">                                                       
+                                                        <div class="col-lg-12">
+                                                            <label for="exampleInputText01" class="h5">Attachments</label>
+                                                            <div class="custom-file">
+                                                                <input type="file" class="custom-file-input" id="inputGroupFile001">
+                                                                <label class="custom-file-label" for="inputGroupFile001">Upload media</label>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>    *@                                
+														</div>
+					</div>
+				</div>
+			</div>
+		}
+	}
+	else
+	{
+		<div class="col-lg-12">
+			<H3 class="text-center text-muted"><i class="ri-information-line mr-2"></i> Không tìm thấy công việc</H3>
+		</div>
+	}
+
+</div>
+
+
+
+

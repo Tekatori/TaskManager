@@ -98,8 +98,9 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="card card-block card-stretch card-height">
                         <div class="card-body">
-                            <h5 class="mb-1">@project.Name</h5>
-                            <p class="mb-3">@project.Description <br />@{string loaiduan="Cá nhân";} @if(project.TeamGroupId != 0 && project.TeamGroupId != null) { loaiduan = "Nhóm"; } Loại Dự án : @loaiduan  <br />Ngày tạo: @project.CreatedAt?.ToString("dd/MM/yyyy")</p>
+                            <h5 class="mb-1">@project.Name  </h5>
+                            <small id="assignedName-@project.Id" class="text-muted"></small>
+                            <p class="mb-3">@project.Description</p>
                             <div class="d-flex align-items-center justify-content-between pt-3 border-top">
                                 <a href="/Task/Index?IdProject=@project.Id"
                                 class="btn btn-white text-info link-shadow"
@@ -291,13 +292,11 @@
                 success: function (res) {
                     if (res.success) {
                         const project = res.data;
-                        const cOwnerId = project.OwnerId ?? project.ownerId;
-
-                        $('#ProjectId').val(project.id);
-                        $('#OwnerId').val(cOwnerId);
-                        $('#Name').val(project.name);
-                        $('#Description').val(project.description);
-                        $('#TeamGroupId').val(project.teamGroupId).selectpicker('refresh');
+                        $('#ProjectId').val(project.Id);
+                        $('#OwnerId').val(project.OwnerId);
+                        $('#Name').val(project.Name);
+                        $('#Description').val(project.Description);
+                        $('#TeamGroupId').val(project.TeamGroupId).selectpicker('refresh');
                         $('#projectModalLabel').text('✏️ Chỉnh sửa Dự án');
                         $('#new-project-modal').modal('show');
                     } else {
@@ -381,6 +380,30 @@
             const urlParams = new URLSearchParams(window.location.search);
             const searchText = urlParams.get('textsearch');
             $('#searchtext').val(searchText);
+        });
+
+
+     $(document).ready(function () {
+            $('[id^="assignedName-"]').each(function () {
+                const element = $(this);
+                const projectId = element.attr('id').split('-')[1];
+
+                $.ajax({
+                    url: '/Project/GetAssignedName',
+                    type: 'POST',
+                    data: { pIdProject: projectId },
+                    success: function (res) {
+                        if (res.success) {
+                            element.html(`Phụ Trách: <span class="text-dark">${res.data}</span>`);
+                        } else {
+                            element.html(`Phụ Trách: <span class="text-danger">Không xác định</span>`);
+                        }
+                    },
+                    error: function () {
+                        element.html(`Phụ Trách: <span class="text-danger">Lỗi kết nối</span>`);
+                    }
+                });
+            });
         });
     </script>
 }

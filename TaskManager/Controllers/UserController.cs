@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using TaskManager.BLL;
 using TaskManager.Models;
-
+using TaskManager.DAL.ViewModel;
 namespace TaskManager.Controllers
 {
     public class UserController : Controller

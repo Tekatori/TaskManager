@@ -13,7 +13,13 @@ namespace TaskManager.Models
             InProgress = 1,
 
             [Description("Hoàn thành")]
-            Completed = 2
+            Completed = 2,
+
+            [Description("Chưa hoàn thành")]
+            NotCompleted = -1,
+
+            [Description("Tất cả trạng thái")]
+            All = -2
         }
         public enum TaskPriority
         {

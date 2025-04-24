@@ -1,4 +1,4 @@
-﻿namespace TaskManager.Models
+﻿namespace TaskManager.DAL.ViewModel
 {
     public class UserViewModel
     {
@@ -13,8 +13,10 @@
     }
     public class TaskParam
     {
-        public int IdProject { get; set; } = 0;
+        public int? IdProject { get; set; }
         public string textsearch { get; set; } = string.Empty;
+        public int? IdStatus { get; set; }
+        public int? IdUser { get; set; }
     }
     public  class TeamGroupViewModel
     {

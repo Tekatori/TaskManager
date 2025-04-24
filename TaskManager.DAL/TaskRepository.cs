@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskManager.DAL.ViewModel;
 using TaskManager.Models;
 namespace TaskManager.DAL
 {
@@ -26,6 +27,54 @@ namespace TaskManager.DAL
                 return us;
             return new List<TaskItem>();
         }
+        public List<TaskItem> GetAllTaskNotDone(int? pIdUser)
+        {
+            List<int> lstIdProject = GetAllListIdProjectUser(pIdUser);
+                      
+            var us = _context.Tasks.Where(t => t.Status != (int)CommonEnums.TaskStatus.Completed && t.ProjectId.HasValue && lstIdProject.Contains(t.ProjectId.Value)).OrderBy(t => t.Status).ToList();
+
+            if (us != null && us.Count() > 0)
+                return us;
+            return new List<TaskItem>();
+        }
+        
+        public List<TaskItem> GetAllTaskByIdStatus(int? pIdStatus)
+        {
+            var us = _context.Tasks.Where(t => t.Status == pIdStatus).ToList();
+            if (us != null && us.Count() > 0)
+                return us;
+            return new List<TaskItem>();
+        }
+        public List<TaskItem> GetListTask(TaskParam param)
+        {
+            List<int> lstIdProject = GetAllListIdProjectUser(param.IdUser);
+
+            var us = _context.Tasks.Where(t => t.ProjectId.HasValue && lstIdProject.Contains(t.ProjectId.Value)).OrderBy(t=>t.Status).ToList();
+
+            if (param.IdProject.HasValue)
+            {
+                us = us.Where(t => t.ProjectId == param.IdProject).ToList();
+            }
+            if(param.IdStatus.HasValue && param.IdStatus != (int)CommonEnums.TaskStatus.All)
+            {
+                if (param.IdStatus == (int)CommonEnums.TaskStatus.NotCompleted)
+                {
+                    us = us.Where(t => t.Status != (int)CommonEnums.TaskStatus.Completed).ToList();
+                }
+                else 
+                {
+                    us = us.Where(t => t.Status == param.IdStatus).ToList();
+                }        
+            }
+            if(!string.IsNullOrEmpty(param.textsearch))
+            {
+                us = us.Where(t => t.Title != null && t.Title.ToLower().Contains(param.textsearch.ToLower())).ToList();
+            }
+            if (us != null && us.Count() > 0)
+                return us;
+            return new List<TaskItem>();
+        }
+
         public TaskItem GetTask(int? pId)
         {
             var task = _context.Tasks.FirstOrDefault(x => x.Id == pId);
@@ -88,6 +137,20 @@ namespace TaskManager.DAL
             }
             res = _context.SaveChanges();
             return res;
+        }
+        private List<int> GetAllListIdProjectUser(int? pIDUser)
+        {
+            List<int> lstIdProject = new List<int>();
+            var user = _context.Users.FirstOrDefault(t => t.Id == pIDUser);
+            if (user != null && user.TeamGroupId.HasValue)
+            {
+                lstIdProject = _context.Projects.Where(t => t.TeamGroupId == user.TeamGroupId || t.OwnerId == user.Id).Select(t => t.Id).ToList();
+            }
+            else
+            {
+                lstIdProject = _context.Projects.Where(t => t.OwnerId == pIDUser).Select(t => t.Id).ToList();
+            }
+            return lstIdProject;
         }
         #endregion
     }
