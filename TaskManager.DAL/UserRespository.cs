@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using TaskManager.DAL.ViewModel;
 using TaskManager.Models;
 namespace TaskManager.DAL
 {
@@ -76,17 +77,28 @@ namespace TaskManager.DAL
         }
         public List<User> GetUserByTeamGroupId(int pTeamGroupId)
         {
-            var us = _context.Users.Where(x => x.TeamGroupId == pTeamGroupId).ToList();
-            if (us != null && us.Count() > 0)
-                return us;
-            return new List<User>();
+            var teamGroup = _context.TeamGroup.FirstOrDefault(t => t.Id == pTeamGroupId);
+            if (teamGroup == null || string.IsNullOrWhiteSpace(teamGroup.ListIdUser))
+                return new List<User>();
+
+            var lstIdUser = teamGroup.ListIdUser.ToIntList();
+            if (lstIdUser.Count == 0)
+                return new List<User>();
+
+            return _context.Users.Where(x => lstIdUser.Contains(x.Id)).ToList();
         }
+
         public List<User> GetUsersExcludingTeamGroupId(int pTeamGroupId)
         {
-            var us = _context.Users.Where(x => x.TeamGroupId != pTeamGroupId && (!x.TeamGroupId.HasValue || x.TeamGroupId == 0)).ToList();
-            if (us != null && us.Count() > 0)
-                return us;
-            return new List<User>();
+            var teamGroup = _context.TeamGroup.FirstOrDefault(t => t.Id == pTeamGroupId);
+            if (teamGroup == null || string.IsNullOrWhiteSpace(teamGroup.ListIdUser))
+                return new List<User>();
+
+            var lstIdUser = teamGroup.ListIdUser.ToIntList();
+            if (lstIdUser.Count == 0)
+                return new List<User>();
+
+            return _context.Users.Where(x => !lstIdUser.Contains(x.Id)).ToList();
         }
         public List<TeamGroup> GetALLTeamGroup()
         {
@@ -123,9 +135,9 @@ namespace TaskManager.DAL
         {
             return SaveData(pTeamGroup, true);
         }
-        public int AddUsertoTeamGroup(int pUserId, int pTeamGroupId)
+        public int AddUsertoTeamGroup(List<int>? pUserIds, int pTeamGroupId)
         {
-            return SaveUsertoTeamGroup(pUserId, pTeamGroupId);
+            return SaveUsertoTeamGroup(pUserIds, pTeamGroupId);
         }
 
         #endregion
@@ -163,15 +175,6 @@ namespace TaskManager.DAL
             }
             else if (pIsDelete == true && teamGroup != null)
             {
-                var lstuserteam = _context.Users.Where(t => t.TeamGroupId == teamGroup.Id);
-                if(lstuserteam != null)
-                {
-                    foreach(var us in lstuserteam)
-                    {
-                        us.TeamGroupId = null;
-                    }
-                    res += _context.SaveChanges();
-                }
                 var lstproject = _context.Projects.Where(t => t.TeamGroupId == teamGroup.Id);
                 if (lstproject != null)
                 {
@@ -181,29 +184,37 @@ namespace TaskManager.DAL
                     }
                     res += _context.SaveChanges();
                 }
-
                 _context.TeamGroup.Remove(teamGroup);
             }
             else
             {
                 _context.TeamGroup.Add(pTeamGroup);
                 res += _context.SaveChanges();
-                res += SaveUsertoTeamGroup(pTeamGroup.CreatedBy ?? 0, pTeamGroup.Id);
+                if (pTeamGroup.CreatedBy.HasValue)
+                {
+                    res += SaveUsertoTeamGroup(new List<int> { pTeamGroup.CreatedBy.Value }, pTeamGroup.Id);
+                }
             }
             res += _context.SaveChanges();
             return res;
         }
-        private int SaveUsertoTeamGroup(int pUserId, int pTeamGroupId)
+        private int SaveUsertoTeamGroup(List<int>? pUserIds, int pTeamGroupId)
         {
-            int res = 0;
-            var user = _context.Users.FirstOrDefault(t => t.Id == pUserId);
-            if (user != null && pUserId != 0)
-            {
-                user.TeamGroupId = pTeamGroupId;
-                res = _context.SaveChanges();
-            }
-            return res;
+            if (pUserIds == null || pUserIds.Count == 0)
+                return 0;
+
+            var teamGroup = _context.TeamGroup.FirstOrDefault(t => t.Id == pTeamGroupId);
+            if (teamGroup == null)
+                return 0;
+
+            var oldIds = teamGroup.ListIdUser?.ToIntList() ?? new List<int>();
+
+            var mergedIds = oldIds.Union(pUserIds).Distinct().ToList();
+
+            teamGroup.ListIdUser = string.Join(",", mergedIds);
+            return _context.SaveChanges();
         }
+
         #endregion
     }
 }

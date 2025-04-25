@@ -1,4 +1,6 @@
-﻿namespace TaskManager.DAL.ViewModel
+﻿using TaskManager.Models;
+
+namespace TaskManager.DAL.ViewModel
 {
     public class UserViewModel
     {
@@ -17,6 +19,7 @@
         public string textsearch { get; set; } = string.Empty;
         public int? IdStatus { get; set; }
         public int? IdUser { get; set; }
+        public int? RoleUser { get; set; } = (int)CommonEnums.Role.User;
     }
     public  class TeamGroupViewModel
     {
@@ -26,5 +29,7 @@
         public DateTime? CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
         public string? CreatedByName { get; set; }
+        public string ListIdUser { get; set; } = string.Empty;
+        public List<int> ListIdUserInt { get; set; } = new List<int>();
     }
 }

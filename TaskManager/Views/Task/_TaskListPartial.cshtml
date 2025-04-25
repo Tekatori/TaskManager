@@ -79,6 +79,22 @@
 							<div class="card mb-3">
 								<div class="card-body">
 									<div class="row">
+										<div class="col-lg-12">
+											<div class="form-group mb-0">
+												<label for="AssignedTo-@task.Id" class="h5">Phụ trách</label>
+												<input disabled type="text" class="form-control assignedToInput"
+													   id="AssignedTo-@task.Id"
+													   data-task-id="@task.Id"
+													   value="@task.AssignedTo" />
+											</div>
+										</div>
+
+									</div>
+								</div>
+							</div>
+							<div class="card mb-3">
+								<div class="card-body">
+									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group mb-0">
 												<label for="Priority-@task.Id" class="h5">Độ ưu tiên</label>

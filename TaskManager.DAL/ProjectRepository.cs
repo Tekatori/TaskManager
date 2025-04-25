@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TaskManager.Models;
-
+using TaskManager.DAL.ViewModel;
 namespace TaskManager.DAL
 {
     public class ProjectRepository
@@ -28,24 +28,37 @@ namespace TaskManager.DAL
         }
         public List<Project> GetAllProjectByUser(int? pIdUser)
         {
-            var user = _context.Users.FirstOrDefault(t => t.Id == pIdUser);
-            if (user != null)
-            {
-                if(user.TeamGroupId != null && user.TeamGroupId != 0)
-                {
-                    var pj = _context.Projects.Where(t => t.OwnerId == pIdUser || t.TeamGroupId == user.TeamGroupId).ToList();
-                    if (pj != null && pj.Count() > 0)
-                        return pj;
-                }
-                else
-                {
-                    var pj = _context.Projects.Where(t => t.OwnerId == pIdUser).ToList();
-                    if (pj != null && pj.Count() > 0)
-                        return pj;
-                }    
-            }    
-            return new List<Project>();
+            if (pIdUser == null)
+                return new List<Project>();
+
+            var user = _context.Users.FirstOrDefault(t => t.Id == pIdUser.Value);
+            if (user == null)
+                return new List<Project>();
+
+            var userId = user.Id;
+
+            var ownedProjects = _context.Projects
+                .Where(p => p.OwnerId == userId)
+                .ToList();
+
+            var teamGroups = _context.TeamGroup
+                .Where(tg => !string.IsNullOrWhiteSpace(tg.ListIdUser))
+                .AsEnumerable() 
+                .Where(tg => tg.ListIdUser.ToIntList().Contains(userId))
+                .Select(tg => tg.Id)
+                .ToList();
+
+            var teamProjects = _context.Projects
+                .Where(p => p.TeamGroupId.HasValue && teamGroups.Contains(p.TeamGroupId.Value))
+                .ToList();
+
+            var allProjects = ownedProjects
+                .Union(teamProjects)
+                .ToList();
+
+            return allProjects;
         }
+
         public List<Project> GetAllProjectByTeamGroup(int? pIdTeamGroup)
         {
             var pj = _context.Projects.Where(t => t.TeamGroupId == pIdTeamGroup).ToList();

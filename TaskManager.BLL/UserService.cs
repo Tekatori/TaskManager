@@ -91,9 +91,9 @@ namespace TaskManager.BLL
         {
             return _repo.DeleteTeamGroup(pTeamGroup);
         }
-        public int AddUsertoTeamGroup(int pUserId, int pTeamGroupId)
+        public int AddUsertoTeamGroup(List<int>? pUserIds, int pTeamGroupId)
         {
-            return _repo.AddUsertoTeamGroup(pUserId, pTeamGroupId);
+            return _repo.AddUsertoTeamGroup(pUserIds, pTeamGroupId);
         }
         #endregion
     }

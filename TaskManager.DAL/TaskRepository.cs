@@ -27,11 +27,16 @@ namespace TaskManager.DAL
                 return us;
             return new List<TaskItem>();
         }
-        public List<TaskItem> GetAllTaskNotDone(int? pIdUser)
+        public List<TaskItem> GetAllTaskNotDone(TaskParam param)
         {
-            List<int> lstIdProject = GetAllListIdProjectUser(pIdUser);
+            List<int> lstIdProject = GetAllListIdProjectUser(param.IdUser);
                       
             var us = _context.Tasks.Where(t => t.Status != (int)CommonEnums.TaskStatus.Completed && t.ProjectId.HasValue && lstIdProject.Contains(t.ProjectId.Value)).OrderBy(t => t.Status).ToList();
+
+            if (param.RoleUser == (int)CommonEnums.Role.User)
+            {
+                us = us.Where(t => t.AssignedTo == param.IdUser).ToList();
+            }
 
             if (us != null && us.Count() > 0)
                 return us;
@@ -50,6 +55,11 @@ namespace TaskManager.DAL
             List<int> lstIdProject = GetAllListIdProjectUser(param.IdUser);
 
             var us = _context.Tasks.Where(t => t.ProjectId.HasValue && lstIdProject.Contains(t.ProjectId.Value)).OrderBy(t=>t.Status).ToList();
+
+            if(param.RoleUser == (int)CommonEnums.Role.User)
+            {
+                us = us.Where(t => t.AssignedTo == param.IdUser).ToList();
+            }    
 
             if (param.IdProject.HasValue)
             {
@@ -140,17 +150,35 @@ namespace TaskManager.DAL
         }
         private List<int> GetAllListIdProjectUser(int? pIDUser)
         {
-            List<int> lstIdProject = new List<int>();
-            var user = _context.Users.FirstOrDefault(t => t.Id == pIDUser);
-            if (user != null && user.TeamGroupId.HasValue)
-            {
-                lstIdProject = _context.Projects.Where(t => t.TeamGroupId == user.TeamGroupId || t.OwnerId == user.Id).Select(t => t.Id).ToList();
-            }
-            else
-            {
-                lstIdProject = _context.Projects.Where(t => t.OwnerId == pIDUser).Select(t => t.Id).ToList();
-            }
-            return lstIdProject;
+            if (pIDUser == null)
+                return new List<int>();
+
+            var user = _context.Users.FirstOrDefault(t => t.Id == pIDUser.Value);
+            if (user == null)
+                return new List<int>();
+
+            var userId = user.Id;
+
+            var ownedProjects = _context.Projects
+                .Where(p => p.OwnerId == userId)
+                .ToList();
+
+            var teamGroups = _context.TeamGroup
+                .Where(tg => !string.IsNullOrWhiteSpace(tg.ListIdUser))
+                .AsEnumerable()
+                .Where(tg => tg.ListIdUser.ToIntList().Contains(userId))
+                .Select(tg => tg.Id)
+                .ToList();
+
+            var teamProjects = _context.Projects
+                .Where(p => p.TeamGroupId.HasValue && teamGroups.Contains(p.TeamGroupId.Value))
+                .ToList();
+
+            var allProjects = ownedProjects
+                .Union(teamProjects)
+                .ToList();
+
+            return allProjects.Select(t=>t.Id).ToList();
         }
         #endregion
     }

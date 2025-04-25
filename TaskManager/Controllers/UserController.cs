@@ -129,25 +129,18 @@ namespace TaskManager.Controllers
         {
             var lstTeamGroup = _userService.GetALLTeamGroup();
 
-            var viewmodel = new List<TeamGroupViewModel>();
-            if (lstTeamGroup != null && lstTeamGroup.Count > 0)
-            {
-               
-                foreach (var item in lstTeamGroup)
+            var viewmodel = ExtensionClass.ConvertList<TeamGroup, TeamGroupViewModel>(lstTeamGroup);
+
+            if (viewmodel != null && viewmodel.Count > 0)
+            {              
+                foreach (var item in viewmodel)
                 {
                     var user = _userService.GetUser(item.CreatedBy ?? 0);
                     if (user != null)
                     {
-                        viewmodel.Add(new TeamGroupViewModel
-                        {
-                            Id = item.Id,
-                            Name = item.Name,
-                            Description = item.Description,
-                            CreatedAt = item.CreatedAt,
-                            CreatedBy = item.CreatedBy,
-                            CreatedByName = user.Username
-                        });
+                        item.CreatedByName = user.Username;
                     }
+                    item.ListIdUserInt = ExtensionClass.ToIntList(item.ListIdUser);
                 }
             }
             var lstUser = _userService.GetAllUser();
@@ -167,6 +160,7 @@ namespace TaskManager.Controllers
           
             teamGroup.CreatedAt = DateTime.Now;
             teamGroup.CreatedBy = currentUser.Id;
+
             var res = _userService.CreateTeamGroup(teamGroup);
             if (res > 0)
             {
@@ -197,9 +191,9 @@ namespace TaskManager.Controllers
             try
             {
                 int res= 0;
-                foreach (var userId in userIds)
-                {
-                    res = _userService.AddUsertoTeamGroup(userId, teamId);
+                if(userIds != null && userIds.Count > 0)
+                {     
+                    res = _userService.AddUsertoTeamGroup(userIds, teamId);
                 }
                 if(res > 0)
                     return Json(new { success = true });

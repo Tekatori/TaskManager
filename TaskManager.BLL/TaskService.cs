@@ -24,9 +24,9 @@ namespace TaskManager.BLL
         {
             return _repo.GetAllTask();
         }
-        public List<TaskItem> GetAllTaskNotDone(int? pIdUser)
+        public List<TaskItem> GetAllTaskNotDone(TaskParam param)
         {
-            return _repo.GetAllTaskNotDone(pIdUser);
+            return _repo.GetAllTaskNotDone(param);
         }
         public List<TaskItem> GetAllTaskByIdStatus(int? pIdStatus)
         {

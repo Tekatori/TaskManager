@@ -17,7 +17,7 @@ namespace TaskManager.Controllers
             _projectService = projectService;
             _userService = userService;
         }
-        public IActionResult Index(TaskParam param)
+        public IActionResult Index()
         {
             var currentUser = CookieHelper.GetLoggedUser(User);
             if (currentUser == null)
@@ -26,8 +26,11 @@ namespace TaskManager.Controllers
             var lstProjectName = _projectService.GetAllProjectByUser(currentUser.Id);
             ViewBag.ListProject = lstProjectName;
 
+            TaskParam param = new TaskParam();
+            param.IdUser = currentUser.Id;
+            param.RoleUser = currentUser.Role;
 
-            var lsttask = _taskService.GetAllTaskNotDone(currentUser.Id);
+            var lsttask = _taskService.GetAllTaskNotDone(param);
             return View(lsttask);
         }
         [HttpGet]
@@ -37,6 +40,7 @@ namespace TaskManager.Controllers
             if (currentUser == null)
                 return RedirectToAction("Login", "User");
             param.IdUser = currentUser.Id;
+            param.RoleUser = currentUser.Role;
 
             var lstProjectName = _projectService.GetAllProjectByUser(currentUser.Id);
             ViewBag.ListProject = lstProjectName;
@@ -152,6 +156,25 @@ namespace TaskManager.Controllers
             if (res > 0)
                 return Json(new { success = true });
             return Json(new { success = false, error = "Xoá thất bại" });
+        }
+        [HttpPost]
+        public JsonResult GetTaskAssigneeName(int? AssignedTo)
+        {
+            if (!AssignedTo.HasValue)
+            {
+                return Json(new { success = false, error = "có lỗi xảy ra" });
+            }
+            string AssignedName = "";
+            var user = _userService.GetUser(AssignedTo.Value);
+            if (user != null)
+            {
+                AssignedName = $"{user.Username} ({user.Email})";
+            }
+            else
+            {
+                return Json(new { success = false, error = "có lỗi xảy ra" });
+            }
+            return Json(new { success = true, data = AssignedName });
         }
     }
 }

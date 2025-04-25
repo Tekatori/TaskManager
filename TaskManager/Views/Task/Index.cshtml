@@ -29,6 +29,20 @@
                             </form>
                         </div>
 
+                        <div class="nav-item nav-icon search-content">
+                            <a href="javascript:void(0)" class="search-toggle rounded" id="dropdownSearch" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="ri-search-line"> <span style="color:ActiveCaption">Click ở đây để tìm kiếm</span></i>
+                            </a>
+                            <div class="iq-search-bar iq-sub-dropdown dropdown-menu" aria-labelledby="dropdownSearch">
+                                <form id="SearchMobile" class="searchbox p-2">
+                                    <div class="form-group mb-0 position-relative">
+                                        <input id="searchtext2" maxlength="200" class="text search-input font-size-12" placeholder="Tên công việc...">
+                                        <button type="submit" href="javascript:void(0)" class="search-link"><i class="ri-search-line"></i></button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
                         <div class="dropdown dropdown-project mr-3">
                             <div class="dropdown-toggle" id="dropdownMenuButton03" data-toggle="dropdown">
                                 <div class="btn bg-body">
@@ -49,7 +63,7 @@
                             </div>
                         </div>
 
-                        <div class="dropdown dropdown-status mr-3">
+                        <div class="dropdown dropdown-project mr-3">
                             <div class="dropdown-toggle" id="dropdownMenuButton-status" data-toggle="dropdown">
                                 <div class="btn bg-body">
                                     <span class="h6" id="selectedStatus">🕓 @CommonEnums.GetDescription(CommonEnums.TaskStatus.New)/@CommonEnums.GetDescription(CommonEnums.TaskStatus.InProgress)</span>
@@ -428,14 +442,23 @@
     <script>
         function doFilterTasks() {
             const text = $('#searchtext').val().trim();
+            const text2 = $('#searchtext2').val().trim();
             const statusId = $('.status-option.active').data('id') || null;
             const projectId = $('.project-option.active').data('id') || null;
+
+
+            let ptextsearch = '';
+            if (window.innerWidth <= 576) {
+                ptextsearch = text2;
+            } else { 
+                ptextsearch = text;
+            }
 
             $.ajax({
                 url: '/Task/FilterTask',
                 type: 'GET',
                 data: {
-                    textsearch: text,
+                    textsearch: ptextsearch,
                     IdStatus: statusId,
                     IdProject: projectId
                 },
@@ -450,6 +473,10 @@
 
         $(document).ready(function () {
             $('#Search').on('submit', function (e) {
+                e.preventDefault();
+                doFilterTasks();
+            });
+            $('#SearchMobile').on('submit', function (e) {
                 e.preventDefault();
                 doFilterTasks();
             });
