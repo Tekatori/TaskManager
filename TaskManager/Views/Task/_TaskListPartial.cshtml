@@ -36,12 +36,25 @@
 
 								<a title="Xem chi tiết" class="btn bg-primary-light mr-3" data-toggle="collapse" href="#collapseEdit1-@task.Id" role="button" aria-expanded="false" aria-controls="collapseEdit1-@task.Id">🔍</a>
 
+								<a title="Xem bình luận" href="javascript:void(0)" class="btn bg-info-light mr-3" onclick="openCommentModal('@task.Id')">
+									<i class="bi bi-chat-dots"></i>
+								</a>
+
+								<a title="Đính kèm" href="javascript:void(0)" class="btn bg-warning-light mr-3" onclick="openAttachmentModal('@task.Id')">
+									<i class="bi bi-paperclip"></i>
+								</a>
+
 								<a title="Cập nhật trạng thái" onclick="openEditModal('@task.Id')" class="btn bg-success-light mr-3">
 									<i class="bi bi-pencil-square"></i>
 								</a>
+
+								
+
 								<a href="#" onclick="event.stopPropagation(); confirmDelete('@task.Id')" class="btn bg-secondary-light" data-bs-toggle="tooltip" title="Xóa">
 									<i class="bi bi-trash"></i>
 								</a>
+								
+
 							</div>
 						</div>
 					</div>

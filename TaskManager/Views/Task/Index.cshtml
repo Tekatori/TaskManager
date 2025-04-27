@@ -13,6 +13,12 @@
 }
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
+<style>
+    .custom-file-input:lang(en) ~ .custom-file-label::after {
+        content: "Chọn tệp";
+    }
+</style>
+
 
 <div class="row">
     <div class="col-lg-12">
@@ -179,10 +185,25 @@
 								<textarea class="form-control" id="Notes" name="Notes" rows="2" placeholder="Nhập ghi chú"></textarea>
 							</div>
 						</div>
+
+
+                        <div class="col-lg-12">
+                            <div class="form-group mb-0">
+                                <label for="Attachment" class="h5">Đính kèm</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="Attachment" name="Attachment" accept="image/*, .pdf, .docx, .xlsx, .zip, .rar">
+                                    <label class="custom-file-label" for="Attachment">Chọn tệp</label>
+                                </div>
+                                <small class="form-text text-muted">Chọn các tệp đính kèm như ảnh, tài liệu PDF, Word, Excel hoặc file nén (.zip, .rar).</small>
+                            </div>
+                        </div>
+
+
+
 						<div class="col-lg-12">
 							<div class="d-flex flex-wrap align-items-ceter justify-content-center mt-4">
-								<button type="submit" class="btn btn-primary mr-3">Lưu</button>
-								<div class="btn btn-secondary" data-dismiss="modal">Huỷ</div>
+                                <button type="submit" class="btn btn-primary mr-3"><i class="fas fa-save"></i>Lưu</button>
+                                <div class="btn btn-secondary" data-dismiss="modal"><i class="bi bi-x-circle"></i>Đóng</div>
 							</div>
 						</div>
 					</div>
@@ -238,11 +259,159 @@
 
                         <div class="col-lg-12">
                             <div class="d-flex flex-wrap align-items-ceter justify-content-center mt-4">
-                                <button type="submit" class="btn btn-primary mr-3">Lưu</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <button type="submit" class="btn btn-primary mr-3"><i class="fas fa-save"></i>Lưu</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i>Đóng</button>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="commentModal"  tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="commentModalLabel">💬 Bình luận công việc</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Đóng">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="comment-list" style="max-height: 300px; overflow-y: auto;">
+                    <p class="text-center text-muted">Đang tải bình luận...</p>
+                </div>
+                <hr />
+
+                <div>
+                    <textarea id="newComment" class="form-control mb-2" rows="3" placeholder="Viết bình luận..."></textarea>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button class="btn btn-primary mr-2" id="btnAddComment">
+                            <i class="bi bi-send"></i> Gửi bình luận
+                        </button>
+                        <button type="button" class="btn btn-warning  mr-2" id="btnClearComment">
+                            <i class="bi bi-eraser"></i> Clear
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle"></i> Đóng
+                        </button>
+                       
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="editCommentModal" tabindex="-1" aria-labelledby="editCommentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCommentModalLabel">Sửa Bình Luận</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Đóng">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <textarea id="editCommentContent" class="form-control mb-3" rows="3"></textarea>
+                <div class="d-flex justify-content-end">
+                    <button id="btnSaveComment" class="btn btn-success"><i class="fas fa-save"></i>Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="attachmentModal" tabindex="-1" aria-labelledby="attachmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="attachmentModalLabel">Đính kèm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="attachmentContent"></div>
+            </div>
+            <div class="modal-footer">            
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> <i class="bi bi-x-circle"></i>Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editAttachmentModal" tabindex="-1" aria-labelledby="editAttachmentModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<form id="editAttachmentForm" method="post" enctype="multipart/form-data">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="editAttachmentModalLabel">Sửa đính kèm</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+
+					<input type="hidden" id="editAttachmentTaskId" name="taskId" />
+					<input type="hidden" id="editIdAttachment" name="IdAttachment" />
+
+
+					<div class="col-lg-12">
+						<div class="form-group mb-0">
+							<label for="newAttachment" class="h5">Đính kèm</label>
+							<div class="custom-file">
+								<input type="file" class="custom-file-input" id="newAttachment" name="newAttachment" accept="image/*, .pdf, .docx, .xlsx, .zip, .rar">
+								<label class="custom-file-label" for="newAttachment">Chọn tệp</label>
+							</div>
+							<small class="form-text text-muted">Chọn các tệp đính kèm như ảnh, tài liệu PDF, Word, Excel hoặc file nén (.zip, .rar).</small>
+						</div>
+					</div>
+
+					<div class="col-lg-12 mr-3">
+						<label for="currentAttachment" class="form-label">Tệp hiện tại</label>
+						<input type="text" class="form-control" id="currentAttachment" value="" readonly>
+					</div>
+				</div>
+				<div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>Lưu</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i>Đóng</button>
+
+				</div>
+			</div>
+
+		</form>
+	</div>
+</div>
+
+<div class="modal fade" id="addAttachmentModal" tabindex="-1" aria-labelledby="addAttachmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form id="addAttachmentForm" method="post" enctype="multipart/form-data">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAttachmentModalLabel">Thêm đính kèm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="taskIdForNewAttachment" name="taskId" />
+
+                    <div class="col-lg-12">
+                        <div class="form-group mb-0">
+                            <label for="newAttachmentFile" class="h5">Chọn tệp đính kèm</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="newAttachmentFile" name="newAttachmentFile" accept="image/*, .pdf, .docx, .xlsx, .zip, .rar">
+                                <label class="custom-file-label" for="newAttachmentFile">Chọn tệp</label>
+                            </div>
+                            <small class="form-text text-muted">Chọn các tệp đính kèm như ảnh, tài liệu PDF, Word, Excel hoặc file nén (.zip, .rar).</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>Lưu</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i>Đóng</button>
                 </div>
             </div>
         </form>
@@ -265,38 +434,50 @@
 
   
                 if (!title) {
-                    Swal.fire('Thiếu thông tin', 'Vui lòng nhập tiêu đề.', 'warning');
+                    showAlert('Vui lòng nhập tiêu đề.', 'warning');
                     return;
                 }
 
                 if (!projectId) {
-                    Swal.fire('Thiếu thông tin', 'Vui lòng chọn dự án.', 'warning');
+                    showAlert('Vui lòng chọn dự án.', 'warning');
                     return;
                 }
 
                 if (!dueDate) {
-                    Swal.fire('Thiếu thông tin', 'Vui lòng chọn hạn chót.', 'warning');
+                     showAlert('Vui lòng chọn hạn chót.', 'warning');
                     return;
                 }
 
 
                 var data = $(this).serialize();
 
-                $.post('/Task/Create', data, function (res) {
-                    if (res.success) {
-                          Swal.fire({
-                                  icon: 'success',
-                                  title:'Đã thêm công việc',
-                                  text: 'Trang sẽ tự làm mới...',
-                                  timer: 1500,
-                                  showConfirmButton: false
-                              }).then(() => {
-                                  location.reload();
-                              });
-                    } else {
-                        Swal.fire('Lỗi', res.error || 'Không thể thêm', 'error');
-                    }
-                });
+                var formData = new FormData(this);
+
+                $.ajax({
+                        url: '/Task/Create', 
+                        type: 'POST',
+                        data: formData,
+                        processData: false,  
+                        contentType: false, 
+                        success: function (res) {
+                            if (res.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Đã thêm công việc',
+                                    text: 'Trang sẽ tự làm mới...',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                showAlert('Có lỗi xảy ra khi gửi dữ liệu.', 'error');
+                            }
+                        },
+                        error: function () {
+                            showAlert('Có lỗi xảy ra khi gửi dữ liệu.', 'error');
+                        }
+                    });
             });
 
 
@@ -306,7 +487,7 @@
                 var notes = $('#editNotes').val().trim();
                 var status = $('#editStatus').val();
                 if (!notes) {
-                    Swal.fire('Thiếu thông tin', 'Vui lòng ghi chú cập nhật.', 'warning');
+                    showAlert('Vui lòng ghi chú cập nhật.', 'info');
                     return;
                 }
                 if(!status)
@@ -329,7 +510,7 @@
                                     location.reload();
                                 });
                     } else {
-                        Swal.fire('Lỗi', res.error || 'Không thể cập nhật', 'error');
+                        showAlert(res.error || 'Không thể cập nhật', 'error');
                     }
                 });
             });
@@ -354,11 +535,11 @@
                         $('#editNotes').val(task.Notes);
                         $('#edit-task-modal').modal('show');
                     } else {
-                        Swal.fire('Lỗi', res.error || 'Không thể lấy dữ liệu.', 'error');
+                             showAlert(res.error || 'Không thể lấy dữ liệu.', 'error');
                     }
                 },
                 error: function () {
-                    Swal.fire('Lỗi', 'Không thể kết nối đến máy chủ.', 'error');
+                  showAlert('Không thể kết nối đến máy chủ.', 'error');
                 }
             });
         }
@@ -390,11 +571,11 @@
                                     location.reload();
                                 });
                             } else {
-                                Swal.fire('Lỗi', res.error || 'Không thể xóa.', 'error');
+                               showAlert(res.error || 'Không thể xóa.', 'error');
                             }
                         },
                         error: function () {
-                            Swal.fire('Lỗi', 'Không thể kết nối server.', 'error');
+                            showAlert('Không thể kết nối server.', 'error');
                         }
                     });
                 }
@@ -429,13 +610,357 @@
                     $assignedTo.selectpicker('refresh');
                 },
                 error: function () {
-                    Swal.fire('Lỗi', 'Không thể kết nối đến máy chủ.', 'error');
+                       showAlert('Không thể kết nối server.', 'error');
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const idProject = urlParams.get('IdProject');
+
+            if (idProject && idProject != "0") {
+                const selectedItem = $('.project-option[data-id="' + idProject + '"]');
+                if (selectedItem.length > 0) {
+                    const projectName = selectedItem.data('name');
+                    $('#selectedProject').text(projectName);
+                    $('.project-option').removeClass('active');
+                    selectedItem.addClass('active');
+                    doFilterTasks();
+                }
+            }
+        });
+
+        function getAssignedToName(taskId, assignedTo) {
+            $.ajax({
+                url: '/Task/GetTaskAssigneeName',
+                type: 'POST',
+                data: { AssignedTo: assignedTo },
+                success: function (res) {
+                    if (res.success) {
+                        $(`#AssignedTo-${taskId}`).val(res.data);
+                    } else {
+                        $(`#AssignedTo-${taskId}`).val(''); 
+                    }
+                },
+                error: function () {
+                    $(`#AssignedTo-${taskId}`).val(''); 
+                }
+            });
+        }
+        $(document).ready(function () {
+            $('.assignedToInput').each(function () {
+                const taskId = $(this).data('task-id');
+                const assignedTo = $(this).val();
+
+                if (assignedTo && assignedTo !== '0') { 
+                    getAssignedToName(taskId, assignedTo); 
                 }
             });
         });
 
 
+        $(document).ready(function () {
+            $('[data-toggle="collapse"]').click(function (e) {
+                var targetCollapse = $(this).attr('href');
+                $('.collapse').not(targetCollapse).collapse('hide');
+            });
+        });
 
+
+        function openCommentModal(taskId) {
+            $('#commentModal').modal('show');
+            $('#commentModal').data('task-id', taskId); 
+
+            loadComments(taskId);
+        }
+
+        function loadComments(taskId) {
+            const $commentList = $('#comment-list');
+            $commentList.html('<p class="text-center text-muted">Đang tải bình luận...</p>');
+
+            $.ajax({
+                url: '/Task/GetCommentsByTask', 
+                type: 'GET',
+                data: { taskId: taskId },
+                success: function (res) {
+                    if (res.success) {
+                        renderComments(res.data);
+                    } else {
+                        $commentList.html(`<p class="text-center text-muted">${res.error ?? 'Không có bình luận.'}</p>`);
+                    }
+                },
+                error: function () {
+                    $commentList.html('<p class="text-center text-danger">Có lỗi xảy ra khi tải bình luận.</p>');
+                }
+            });
+        }
+
+        function renderComments(comments) {
+            const $commentList = $('#comment-list');
+            if (!comments || comments.length === 0) {
+                $commentList.html('<p class="text-center text-muted">Chưa có bình luận nào.</p>');
+                return;
+            }
+
+            let html = '';
+                comments.forEach(c => {
+                html += `
+                    <div class="mb-3 border-bottom pb-2" data-comment-id="${c.Id}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>${c.UserName}</strong>
+                                <small class="text-muted ms-2">${formatDateTime(c.CreatedAt)}</small>
+                            </div>
+                            
+                        </div>
+                        <div class="comment-content">${c.Content}</div>
+                    </div>
+                `;
+            });
+
+            $commentList.html(html);
+        }
+
+          // <a href="javascript:void(0)" class="btn bg-success-light mr-3 edit-comment-btn" data-comment-id="${c.Id}">
+          //                       <i class="bi bi-pencil-square"></i>
+          //                     </a>
+
+        function formatDateTime(dateString) {
+            const date = new Date(dateString);
+            return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+        }
+
+
+        $(document).on('click', '.open-comment-modal', function () {
+            const taskId = $(this).data('task-id');  
+            $('#commentModal').data('task-id', taskId);
+            $('#newComment').val('');  
+        });
+
+        $(document).on('click', '#btnAddComment', function () {
+            const taskId = $('#commentModal').data('task-id');
+            const content = $('#newComment').val().trim();
+
+            if (!content) {
+                showAlert('Vui lòng nhập nội dung bình luận!', 'warning');
+                return;
+            }
+
+            $.ajax({
+                url: '/Task/AddComment',
+                type: 'POST',
+                data: { TaskId: taskId, Content: content },
+                success: function (res) {
+                    if (res.success) {
+                        $('#newComment').val('');
+                        loadComments(taskId);
+                    } else {
+                         showAlert('Có lỗi xảy ra!', 'error');
+                    }
+                },
+                error: function () {
+                   showAlert('Có lỗi xảy ra khi gửi bình luận!', 'error');
+                }
+            });
+        });
+
+
+        $(document).on('click', '#btnClearComment', function () {
+            $('#newComment').val(''); 
+        });
+
+        // chức năng chỉnh sửa bình luận
+        //   $(document).on('click', '.edit-comment-btn', function () {
+        //     const commentId = $(this).data('comment-id'); // Lấy ID của bình luận
+        //       const commentContent = $(this).closest('div').next('.comment-content').text().trim();
+
+        //     // Đưa ID và nội dung vào modal
+        //     $('#editCommentModal').data('comment-id', commentId);
+        //     $('#editCommentContent').val(commentContent); // Đưa nội dung vào ô input
+
+        //     // Hiển thị modal
+        //     $('#editCommentModal').modal('show');
+        // });
+
+        //  $('#btnSaveComment').on('click', function () {
+        //     const commentId = $('#editCommentModal').data('comment-id');
+        //     const updatedContent = $('#editCommentContent').val().trim();
+
+        //     if (!updatedContent) {
+        //         alert('Vui lòng nhập nội dung bình luận!');
+        //         return;
+        //     }
+
+        //     $.ajax({
+        //         url: '/Task/UpdateComment',
+        //         type: 'POST',
+        //         data: {
+        //             commentId: commentId,
+        //             content: updatedContent
+        //         },
+        //         success: function (res) {
+        //             if (res.success) {
+        //                 // Đóng modal và tải lại bình luận
+        //                 $('#editCommentModal').modal('hide');
+        //                 loadComments(commentId); // Cập nhật lại bình luận
+        //             } else {
+        //                 alert(res.error ?? 'Có lỗi xảy ra!');
+        //             }
+        //         },
+        //         error: function () {
+        //             alert('Có lỗi xảy ra khi cập nhật bình luận!');
+        //         }
+        //     });
+        // });
+
+
+
+        function openAttachmentModal(taskId) {
+            $.ajax({
+                url: '/Task/GetAttachments',
+                type: 'GET',
+                data: { taskId: taskId },
+                success: function (data) {
+                    if (data.success && data.attachment) {
+                        var attachmentHtml = `                  
+                            <div>
+                                   <a onclick="openEditAttachmentModal(${taskId}, '${data.attachment.Id}','${data.attachment.FileName}')" title="Sửa đính kèm" href="javascript:void(0)" class="btn bg-success-light ml-2">
+                                       <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                   <a onclick="deleteAttachment(${taskId}, '${data.attachment.Id}')" title="Xoá đính kèm" href="javascript:void(0)" class="btn bg-danger-light ml-2">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                <a class="ml-2" href="${data.attachment.FileUrl}" target="_blank">${data.attachment.FileName}</a>
+                            </div>
+                        `;
+                        $('#attachmentContent').html(attachmentHtml);
+                        $('#attachmentModal').modal('show');
+                    } else {
+                        var noAttachmentHtml = `
+                                <div class="d-flex align-items-center">
+                                    <a title="Thêm đính kèm" onclick="openAddAttachmentModal(${taskId})" href="javascript:void(0)" class="btn bg-primary-light ml-2"><i class="bi bi-plus-circle"></i></a>
+                                    <p class="mb-0 ml-2">Không có đính kèm nào</p>
+                                </div>
+                            `;
+                        $('#attachmentContent').html(noAttachmentHtml);
+                        $('#attachmentModal').modal('show');
+                    }
+                },
+                error: function () {
+                    showAlert('Có lỗi xảy ra khi tải đính kèm.', 'error');
+                }
+            });
+        }
+        function openEditAttachmentModal(taskId, IdAttachment,filename) {
+            $('#editAttachmentModal').modal('show');
+            $('#editAttachmentTaskId').val(taskId);
+            $('#editIdAttachment').val(IdAttachment);
+            $('#currentAttachment').val(filename);
+          }
+
+         $('#editAttachmentForm').submit(function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);  
+            var taskId = $('#editAttachmentTaskId').val();
+
+            $.ajax({
+                url: '/Task/EditAttachment', 
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    if (data.success) {
+
+                        openAttachmentModal(taskId); 
+                        
+                        showAlert('Sửa đính kèm thành công', 'success');
+
+                          $('#editAttachmentModal').modal('hide');
+
+                          $('#newAttachment').val('');
+
+                          $('#newAttachment').next('.custom-file-label').html('Chọn tệp');
+
+                    } else {
+                       showAlert(data.error || 'Không thể lưu đính kèm', 'error');
+                    }
+                },
+                error: function () {
+                   showAlert('Có lỗi xảy ra khi lưu đính kèm', 'error');
+                }
+            });
+        });
+
+
+        function openAddAttachmentModal(taskId) {
+            $('#taskIdForNewAttachment').val(taskId);
+
+            $('#addAttachmentModal').modal('show');
+        }
+
+        $('#addAttachmentForm').submit(function (e) {
+            e.preventDefault();  
+
+            var formData = new FormData(this);
+            var taskId = $('#taskIdForNewAttachment').val();
+
+            $.ajax({
+                url: '/Task/AddAttachment', 
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    if (data.success) {
+                        showAlert('Thêm đính kèm thành công', 'success');
+                        openAttachmentModal(taskId); 
+                        $('#addAttachmentModal').modal('hide');
+                        $('#newAttachmentFile').val('');
+                        $('#newAttachmentFile').next('.custom-file-label').html('Chọn tệp');
+                    } else {
+                        showAlert(data.error || 'Không thể thêm đính kèm', 'error');
+                    }
+                },
+                error: function () {
+                    showAlert('Có lỗi xảy ra khi thêm đính kèm', 'error');
+                }
+            });
+        });
+
+    
+          function deleteAttachment(taskId, attachmentId) {
+              Swal.fire({
+                  title: 'Bạn chắc chắn muốn xoá đính kèm này?',
+                  text: "Hành động này không thể hoàn tác!",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#d33',
+                  cancelButtonColor: '#3085d6',
+                  confirmButtonText: 'Xóa',
+                  cancelButtonText: 'Hủy'
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      $.ajax({
+                          url: '/Task/DeleteAttachment',
+                          type: 'POST',
+                          data: { taskId: taskId, attachmentId: attachmentId  },
+                          success: function (res) {
+                              if (res.success) {
+                                    showAlert('Đã xoá đính kèm thành công', 'success');
+                                    openAttachmentModal(taskId);
+                                } else {
+                                    showAlert(data.error || 'Có lỗi xảy ra khi xoá đính kèm', 'error');
+                              }
+                          },
+                          error: function () {
+                                  showAlert('Có lỗi xảy ra khi xoá đính kèm', 'error');
+                          }
+                      });
+                  }
+              });
+          }
 
     </script>
 
@@ -466,7 +991,7 @@
                     $('#task-container').html(html);
                 },
                 error: function () {
-                    alert('Lỗi khi lọc công việc.');
+                    showAlert('Lỗi khi lọc công việc.', 'error');
                 }
             });
         }

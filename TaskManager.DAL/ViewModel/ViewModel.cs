@@ -32,4 +32,19 @@ namespace TaskManager.DAL.ViewModel
         public string ListIdUser { get; set; } = string.Empty;
         public List<int> ListIdUserInt { get; set; } = new List<int>();
     }
+    public class CommentParam
+    {
+        public int? TaskId { get; set; }
+
+    }
+    public class CommentViewModel
+    {
+        public int Id { get; set; }
+        public int TaskId { get; set; }
+        public int UserId { get; set; }
+
+        public string Content { get; set; } = string.Empty;
+        public DateTime? CreatedAt { get; set; }
+        public string UserName { get; set; } = string.Empty;
+    }
 }

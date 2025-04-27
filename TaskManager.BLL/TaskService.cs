@@ -48,6 +48,26 @@ namespace TaskManager.BLL
         {
             return _repo.GetListTask(param);
         }
+        public List<CommentViewModel> GetCommentsByIdTask(CommentParam param)
+        {
+            return _repo.GetCommentsByIdTask(param);
+        }
+        public int SaveCommentTask(CommentViewModel model)
+        {
+            return _repo.SaveCommentTask(model);
+        }
+        public int SaveAttachmentTask(Attachment model)
+        {
+            return _repo.SaveAttachmentTask(model);
+        }
+        public Attachment GetAttachmentsByTaskId(int? pIdTask)
+        {
+            return _repo.GetAttachmentsByTaskId(pIdTask);
+        }
+        public int DeleteAttachment(Attachment attachment)
+        {
+            return _repo.DeleteAttachment(attachment);
+        }
         #endregion
 
         #region CRUD

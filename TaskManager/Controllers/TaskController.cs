@@ -72,7 +72,7 @@ namespace TaskManager.Controllers
             return Json(new { success = false, error = "Có lỗi xảy ra" });
         }
         [HttpPost]
-        public JsonResult Create(TaskItem taskItem)
+        public JsonResult Create(TaskItem taskItem,IFormFile attachment)
         {
             if (string.IsNullOrEmpty(taskItem.Title))
             {
@@ -87,7 +87,21 @@ namespace TaskManager.Controllers
             }
             var res = _taskService.CreateTask(taskItem);
             if (res > 0)
+            {
+                string filename = FileHelper.SaveFile(attachment);
+
+                if(!string.IsNullOrEmpty(filename))
+                {
+                    Attachment attach = new Attachment();
+                    attach.TaskId = taskItem.Id;
+                    attach.FileName = filename;
+                    attach.FileUrl = "/uploads/" + filename;
+                    attach.UploadedAt = DateTime.Now;
+                    var resAttach = _taskService.SaveAttachmentTask(attach);
+                }
                 return Json(new { success = true });
+            }    
+                
             return Json(new { success = false, error = "Tạo dự án thất bại" });
         }
         [HttpPost]
@@ -176,5 +190,133 @@ namespace TaskManager.Controllers
             }
             return Json(new { success = true, data = AssignedName });
         }
+        [HttpGet]
+        public JsonResult GetCommentsByTask(int taskId)
+        {
+            var comments = _taskService.GetCommentsByIdTask(new CommentParam { TaskId = taskId });
+            return Json(new { success = true, data = comments });
+        }
+
+        [HttpPost]
+        public JsonResult AddComment(CommentViewModel model)
+        {
+            var currentUser = CookieHelper.GetLoggedUser(User);
+            if(currentUser == null)
+            {
+                return Json(new { success = false, error = "Không thể thêm bình luận" });
+            }
+            if (currentUser.Id.HasValue)
+            {
+                model.UserId = currentUser.Id.Value;
+            }
+            var result = _taskService.SaveCommentTask(model);
+            if (result > 0)
+                return Json(new { success = true });
+            return Json(new { success = false, error = "Không thể thêm bình luận" });
+        }
+        public IActionResult GetAttachments(int taskId)
+        {
+            var attachment = _taskService.GetAttachmentsByTaskId(taskId); 
+
+            if (attachment != null)
+            {
+                var attachmentData = new
+                {
+                    attachment.Id,
+                    attachment.FileName,
+                    attachment.FileUrl
+                };
+
+                return Json(new { success = true, attachment = attachmentData });
+            }
+
+            return Json(new { success = false, error = "Không có đính kèm nào." });
+        }
+        [HttpPost]
+        public JsonResult EditAttachment(int taskId, int IdAttachment, IFormFile newAttachment)
+        {
+            if (newAttachment != null)
+            {
+                var attach = _taskService.GetAttachmentsByTaskId(taskId);
+                if (attach != null)
+                {
+                    string oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", attach.FileUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        System.IO.File.Delete(oldFilePath);
+                    }
+
+                    string filename = FileHelper.SaveFile(newAttachment);
+                    if (string.IsNullOrEmpty(filename))
+                    {
+                        return Json(new { success = false, error = "Không thể lưu tệp đính kèm mới." });
+                    }
+
+                    attach.FileName = filename;
+                    attach.FileUrl = "/uploads/" + filename;
+                    attach.UploadedAt = DateTime.Now;
+
+                    var res = _taskService.SaveAttachmentTask(attach);
+                    if (res > 0)
+                    {
+                        return Json(new { success = true });
+                    }
+                }
+            }
+            return Json(new { success = false, error = "Vui lòng chọn đính kèm." });
+        }
+        [HttpPost]
+        public JsonResult AddAttachment(int taskId, IFormFile newAttachmentFile)
+        {
+            if (newAttachmentFile != null)
+            {
+                string filename = FileHelper.SaveFile(newAttachmentFile);
+                if (string.IsNullOrEmpty(filename))
+                {
+                    return Json(new { success = false, error = "Không thể lưu tệp đính kèm." });
+                }
+
+                var attachment = new Attachment
+                {
+                    TaskId = taskId,
+                    FileName = filename,
+                    FileUrl = "/uploads/" + filename,
+                    UploadedAt = DateTime.Now
+                };
+
+                var res = _taskService.SaveAttachmentTask(attachment);
+                if (res > 0)
+                {
+                    return Json(new { success = true });
+                }
+            }
+
+            return Json(new { success = false, error = "Có lỗi xảy ra khi thêm đính kèm." });
+        }
+        [HttpPost]
+        public JsonResult DeleteAttachment(int taskId, int attachmentId)
+        {
+            var attachment = _taskService.GetAttachmentsByTaskId(taskId);
+            if (attachment != null)
+            {
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", attachment.FileUrl.TrimStart('/'));
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);  
+                }
+
+                var result = _taskService.DeleteAttachment(attachment);
+                if (result > 0)
+                {
+                    return Json(new { success = true });
+                }
+            }
+
+            return Json(new { success = false, error = "Có lỗi xảy ra khi xoá đính kèm." });
+        }
+
+
+
+
     }
 }

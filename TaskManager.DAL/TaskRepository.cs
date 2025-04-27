@@ -117,7 +117,86 @@ namespace TaskManager.DAL
         {
             return SaveData(pTask, true);
         }
+        public List<CommentViewModel> GetCommentsByIdTask(CommentParam param)
+        {
+            if (param == null || !param.TaskId.HasValue)
+                return new List<CommentViewModel>();
 
+            var lstComment = _context.Comments.Where(t => t.TaskId == param.TaskId).ToList();
+            var lstcommentV = ExtensionClass.ConvertList<Comment, CommentViewModel>(lstComment);
+
+            if (lstcommentV?.Count > 0)
+            {
+                foreach (var item in lstcommentV)
+                {
+                    var user = _context.Users.FirstOrDefault(t => t.Id == item.UserId);
+                    if (user != null)
+                    {
+                        item.UserName = $"{user.Username} ({user.Email})";
+                    }
+                }
+            }
+
+            return lstcommentV ?? new List<CommentViewModel>();
+        }
+
+        public int SaveCommentTask(CommentViewModel model)
+        {
+            int res = 0;
+            if(model.Id == 0 && model.TaskId != 0 && model.UserId != 0 && !string.IsNullOrEmpty(model.Content))
+            {
+                Comment comment = new Comment();
+                comment.TaskId = model.TaskId;
+                comment.UserId = model.UserId;
+                comment.Content = model.Content;
+                comment.CreatedAt = DateTime.Now;
+                _context.Comments.Add(comment);
+            }
+            else
+            {
+                var findcomment = _context.Comments.FirstOrDefault(t => t.Id == model.Id);
+                if(findcomment != null)
+                {
+                    findcomment.Content = model.Content;
+                }
+            }
+            res = _context.SaveChanges();
+            return res;
+        }
+        public int SaveAttachmentTask(Attachment model)
+        {
+            int res = 0;
+            if (model.Id == 0 && model.TaskId != 0 && !string.IsNullOrEmpty(model.FileName))
+            {
+                _context.Attachments.Add(model);
+            }
+            else
+            {
+                var findcomment = _context.Attachments.FirstOrDefault(t => t.Id == model.Id);
+                if (findcomment != null)
+                {
+                    findcomment.FileName = model.FileName;
+                }
+            }
+            res = _context.SaveChanges();
+            return res;
+        }
+        public Attachment GetAttachmentsByTaskId(int? pIdTask)
+        {
+            var attachment = _context.Attachments.FirstOrDefault(t => t.TaskId == pIdTask);
+            if (attachment != null)
+                return attachment;
+            return null;
+        }
+        public int DeleteAttachment(Attachment attachment)
+        {
+            if(attachment != null)
+            {
+                _context.Attachments.Remove(attachment);
+                return _context.SaveChanges();
+            }
+            return 0;
+        }
         #endregion
 
         #region Private
@@ -139,6 +218,18 @@ namespace TaskManager.DAL
             }
             else if (pIsDelete == true && taskItem != null)
             {
+                var findcomment = _context.Comments.Where(t => t.TaskId == taskItem.Id).ToList();
+                if (findcomment != null && findcomment.Count() > 0)
+                {
+                    _context.Comments.RemoveRange(findcomment);
+                }
+
+                var findAttachments = _context.Attachments.Where(t => t.TaskId == taskItem.Id).ToList();
+                if (findAttachments != null && findAttachments.Count() > 0)
+                {
+                    _context.Attachments.RemoveRange(findAttachments);
+                }
+
                 _context.Tasks.Remove(taskItem);
             }
             else
