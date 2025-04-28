@@ -84,7 +84,6 @@ namespace TaskManager.DAL
                 return us;
             return new List<TaskItem>();
         }
-
         public TaskItem GetTask(int? pId)
         {
             var task = _context.Tasks.FirstOrDefault(x => x.Id == pId);
@@ -97,6 +96,7 @@ namespace TaskManager.DAL
             if (lsttask != null && lsttask.Count() > 0) return lsttask;
             return new List<TaskItem>();
         }
+
         public string GetProjectName(int? pIdProject) 
         {
             var pj = _context.Projects.FirstOrDefault(t=>t.Id == pIdProject);
@@ -139,6 +139,33 @@ namespace TaskManager.DAL
 
             return lstcommentV ?? new List<CommentViewModel>();
         }
+        public List<CommentViewModel> GetAllCommentsByIdUser(TaskParam param)
+        {
+            var lstidtask = GetListTask(param).Select(t=>t.Id).ToList();
+            var lstComment = _context.Comments.OrderByDescending(t=>t.CreatedAt).Where(t => lstidtask.Contains(t.TaskId)).Take(5).ToList();
+
+            var lstcommentV = ExtensionClass.ConvertList<Comment, CommentViewModel>(lstComment);
+
+            if (lstcommentV?.Count > 0)
+            {
+                foreach (var item in lstcommentV)
+                {
+                    var user = _context.Users.FirstOrDefault(t => t.Id == item.UserId);
+                    if (user != null)
+                    {
+                        item.UserName = $"{user.Username} ({user.Email})";
+                    }
+                    var task = _context.Tasks.FirstOrDefault(t => t.Id == item.TaskId);
+                    if (task != null)
+                    {
+                        item.TaskName = task.Title;
+                    }
+                }
+            }
+
+            return lstcommentV ?? new List<CommentViewModel>();
+        }
+
 
         public int SaveCommentTask(CommentViewModel model)
         {

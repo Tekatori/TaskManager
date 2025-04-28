@@ -35,7 +35,7 @@
                             </form>
                         </div>
 
-                        <div class="nav-item nav-icon search-content">
+                        <div class="nav-item nav-icon search-content mr-3">
                             <a href="javascript:void(0)" class="search-toggle rounded" id="dropdownSearch" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="ri-search-line"> <span style="color:ActiveCaption">Click ở đây để tìm kiếm</span></i>
                             </a>
@@ -47,6 +47,12 @@
                                     </div>
                                 </form>
                             </div>
+                        </div>
+
+                        <div class="list-grid-toggle d-flex align-items-center mr-3">
+                            <button type="button" class="btn btn-warning" id="btnClearSearch">
+                                <i class="bi bi-eraser"></i>
+                            </button>
                         </div>
 
                         <div class="dropdown dropdown-project mr-3">
@@ -85,7 +91,7 @@
                             </div>
                         </div>
 
-                        <a href="javascript:void(0)" class="btn btn-primary" data-target="#new-task-modal" data-toggle="modal">
+                        <a href="javascript:void(0)" onclick="openAddModal()" class="btn btn-primary">
                             <i class="bi bi-plus-circle"></i> Thêm công việc
                         </a>
                     </div>
@@ -93,9 +99,9 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-12" >
+    <div class="col-lg-12" id="task-container">
         <div class="card">
-            <div class="card-body" id="task-container">
+            <div class="card-body" >
                 @Html.Partial("_TaskListPartial", Model)
             </div>
         </div>
@@ -151,8 +157,6 @@
                                 </div>
                             </div>
                         </div>
-
-
 						<div class="col-lg-6">
 							<label for="Priority" class="h5">Độ ưu tiên</label>
 							<div class="dropdown bootstrap-select form-control">
@@ -185,8 +189,6 @@
 								<textarea class="form-control" id="Notes" name="Notes" rows="2" placeholder="Nhập ghi chú"></textarea>
 							</div>
 						</div>
-
-
                         <div class="col-lg-12">
                             <div class="form-group mb-0">
                                 <label for="Attachment" class="h5">Đính kèm</label>
@@ -197,13 +199,10 @@
                                 <small class="form-text text-muted">Chọn các tệp đính kèm như ảnh, tài liệu PDF, Word, Excel hoặc file nén (.zip, .rar).</small>
                             </div>
                         </div>
-
-
-
 						<div class="col-lg-12">
 							<div class="d-flex flex-wrap align-items-ceter justify-content-center mt-4">
                                 <button type="submit" class="btn btn-primary mr-3"><i class="fas fa-save"></i>Lưu</button>
-                                <div class="btn btn-secondary" data-dismiss="modal"><i class="bi bi-x-circle"></i>Đóng</div>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i>Đóng</button>
 							</div>
 						</div>
 					</div>
@@ -217,7 +216,7 @@
 
 
 <div class="modal fade bd-example-modal-lg" role="dialog" aria-modal="true" id="edit-task-modal">
-    <div class="modal-dialog  modal-dialog-centered modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <form id="editTaskForm">
             <div class="modal-content">
                 <div class="modal-header d-block text-center pb-3 border-bttom">
@@ -449,8 +448,6 @@
                 }
 
 
-                var data = $(this).serialize();
-
                 var formData = new FormData(this);
 
                 $.ajax({
@@ -479,9 +476,7 @@
                         }
                     });
             });
-
-
-         
+      
             $('#editTaskForm').submit(function (e) {
                 e.preventDefault();
                 var notes = $('#editNotes').val().trim();
@@ -521,6 +516,35 @@
             $('#ProjectId').selectpicker('refresh');
             $('#AssignedTo').selectpicker('refresh');
         });
+
+          function openAddModal() {
+              $('#Title').val('');
+
+              $('#DueDate').val('');
+              $('#Notes').val('');
+              $('#Description').val('');
+              $('#Attachment').val('');
+              $('#Attachment').next('.custom-file-label').html('Chọn tệp');
+
+              var selectedProjectId = $('.project-option.active').data('id');
+              if(selectedProjectId == null || selectedProjectId == 0)
+              {
+                 selectedProjectId = '@(lstProject.FirstOrDefault()?.Id ?? 0)';
+              }
+              $('#ProjectId').val(selectedProjectId).selectpicker('refresh').change();
+
+              $('#Priority').val('@((int)CommonEnums.TaskPriority.Medium)').selectpicker('refresh');
+
+
+              $('#new-task-modal').modal('show');
+          }
+
+          $(document).ready(function () {
+              const urlParams = new URLSearchParams(window.location.search);
+              if (urlParams.get('popup') === 'add') {
+                     openAddModal();
+              }
+          });
 
         function openEditModal(id) {
             $.ajax({
@@ -584,7 +608,6 @@
 
       $('#ProjectId').on('change', function () {
             const projectId = $(this).val();
-            const $assignedToWrapper = $('#assignedToWrapper'); 
             const $assignedTo = $('#AssignedTo');
 
             $.ajax({
@@ -630,6 +653,52 @@
                 }
             }
         });
+
+        $(document).ready(function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const IdTaskRedirect = urlParams.get('IdTaskRedirectCmt');
+
+            if (IdTaskRedirect) {
+                    fetch(`/Task/GetTaskById?id=${IdTaskRedirect}`)
+                        .then(response => response.json())
+                        .then(responseData => {
+                            if (responseData && responseData.success && responseData.data) {
+                                const task = responseData.data;
+                                $('#searchtext').val(task.Title);
+                                $('#searchtext2').val(task.Title);
+                                doFilterTasks();
+                                openCommentModal(task.Id);
+                            } else {
+                                showAlert('Dữ liệu không hợp lệ', 'error');
+                            }
+                        })
+                        .catch(error => showAlert('Dữ liệu không hợp lệ', 'error'));
+             } 
+        });
+
+        $(document).ready(function () {
+              const urlParams = new URLSearchParams(window.location.search);
+              const IdTaskRedirect = urlParams.get('IdTaskRedirect');
+
+              if (IdTaskRedirect) {
+                      fetch(`/Task/GetTaskById?id=${IdTaskRedirect}`)
+                          .then(response => response.json())
+                          .then(responseData => {
+                              if (responseData && responseData.success && responseData.data) {
+                                  const task = responseData.data;
+                                  $('#searchtext').val(task.Title);
+                                  $('#searchtext2').val(task.Title);
+                                  doFilterTasks();
+                              } else {
+                                  showAlert('Dữ liệu không hợp lệ', 'error');
+                              }
+                          })
+                          .catch(error => showAlert('Dữ liệu không hợp lệ', 'error'));
+               }
+          });
+
+
+  
 
         function getAssignedToName(taskId, assignedTo) {
             $.ajax({
@@ -961,6 +1030,12 @@
                   }
               });
           }
+
+       $(document).on('click', '#btnClearSearch', function () {
+             $('#searchtext').val('');
+             $('#searchtext2').val('');
+             doFilterTasks();
+        });
 
     </script>
 

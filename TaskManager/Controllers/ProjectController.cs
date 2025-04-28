@@ -15,7 +15,23 @@ namespace TaskManager.Controllers
             _projectService = projectService;
             _userService = userService;
         }
-        public IActionResult Index(string textsearch = "")
+        public IActionResult Index()
+        {
+            var currentUser = CookieHelper.GetLoggedUser(User);
+            if (currentUser == null)
+                return RedirectToAction("Login", "User");
+
+            var projects = _projectService.GetAllProjectByUser(currentUser.Id);
+
+            if(currentUser.Role ==(int)CommonEnums.Role.Admin || currentUser.Role == (int)CommonEnums.Role.Leader)
+            {
+                var lstteamGroup = _userService.GetALLTeamGroup();
+                ViewBag.lstteamGroup = lstteamGroup;
+            }         
+            return View(projects);
+        }
+        [HttpGet]
+        public IActionResult FilterProject(string textsearch = "")
         {
             var currentUser = CookieHelper.GetLoggedUser(User);
             if (currentUser == null)
@@ -30,13 +46,15 @@ namespace TaskManager.Controllers
                 .ToList();
                 projects = filteredProjects;
             }
-            if(currentUser.Role ==(int)CommonEnums.Role.Admin || currentUser.Role == (int)CommonEnums.Role.Leader)
+            if (currentUser.Role == (int)CommonEnums.Role.Admin || currentUser.Role == (int)CommonEnums.Role.Leader)
             {
                 var lstteamGroup = _userService.GetALLTeamGroup();
                 ViewBag.lstteamGroup = lstteamGroup;
-            }         
-            return View(projects);
+            }
+            return PartialView("_ProjectListPartial", projects);
         }
+
+
         [HttpPost]
         public JsonResult GetAssignedName(int? pIdProject)
         {

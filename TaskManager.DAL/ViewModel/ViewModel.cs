@@ -46,5 +46,17 @@ namespace TaskManager.DAL.ViewModel
         public string Content { get; set; } = string.Empty;
         public DateTime? CreatedAt { get; set; }
         public string UserName { get; set; } = string.Empty;
+        public string TaskName { get; set; } = string.Empty;
+    }
+    public class DashboardViewModel
+    {
+        public int CountTask { get; set; } = 0;
+        public int CountTaskInProcess { get; set; } = 0;
+        public int CountTaskDone { get; set; } = 0;
+        public int CountProject { get; set; } = 0;
+        public int CountUser { get; set; } = 0;
+        public List<CommentViewModel> ListLastedComments { get; set; } = new List<CommentViewModel>();
+        public List<TaskItem> ListDeadlines { get; set; } = new List<TaskItem>();
+        public List<TaskItem> ListRecently  { get; set; } = new List<TaskItem>();
     }
 }

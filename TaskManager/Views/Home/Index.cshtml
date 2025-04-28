@@ -1,153 +1,313 @@
-﻿@{
-    ViewData["Title"] = "Dashboard";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+﻿@model TaskManager.DAL.ViewModel.DashboardViewModel
+@{
+	ViewData["Title"] = "Dashboard";
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<link href="~/css/dashboards.css" rel="stylesheet" />
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-6 col-lg-3">
-            <div class="card card-block card-stretch card-height">
-                <div class="card-body">
-                    <div class="top-block d-flex align-items-center justify-content-between">
-                        <h5>Investment</h5>
-                        <span class="badge badge-primary">Monthly</span>
-                    </div>
-                    <h3>$<span class="counter" style="visibility: visible;">35000</span></h3>
-                    <div class="d-flex align-items-center justify-content-between mt-1">
-                        <p class="mb-0">Total Revenue</p>
-                        <span class="text-primary">65%</span>
-                    </div>
-                    <div class="iq-progress-bar bg-primary-light mt-2">
-                        <span class="bg-primary iq-progress progress-1" data-percent="65" style="transition: width 2s; width: 65%;"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="card card-block card-stretch card-height">
-                <div class="card-body">
-                    <div class="top-block d-flex align-items-center justify-content-between">
-                        <h5>Sales</h5>
-                        <span class="badge badge-warning">Anual</span>
-                    </div>
-                    <h3>$<span class="counter" style="visibility: visible;">25100</span></h3>
-                    <div class="d-flex align-items-center justify-content-between mt-1">
-                        <p class="mb-0">Total Revenue</p>
-                        <span class="text-warning">35%</span>
-                    </div>
-                    <div class="iq-progress-bar bg-warning-light mt-2">
-                        <span class="bg-warning iq-progress progress-1" data-percent="35" style="transition: width 2s; width: 35%;"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="card card-block card-stretch card-height">
-                <div class="card-body">
-                    <div class="top-block d-flex align-items-center justify-content-between">
-                        <h5>Cost</h5>
-                        <span class="badge badge-success">Today</span>
-                    </div>
-                    <h3>$<span class="counter" style="visibility: visible;">33000</span></h3>
-                    <div class="d-flex align-items-center justify-content-between mt-1">
-                        <p class="mb-0">Total Revenue</p>
-                        <span class="text-success">85%</span>
-                    </div>
-                    <div class="iq-progress-bar bg-success-light mt-2">
-                        <span class="bg-success iq-progress progress-1" data-percent="85" style="transition: width 2s; width: 85%;"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="card card-block card-stretch card-height">
-                <div class="card-body">
-                    <div class="top-block d-flex align-items-center justify-content-between">
-                        <h5>Profit</h5>
-                        <span class="badge badge-info">Weekly</span>
-                    </div>
-                    <h3>$<span class="counter" style="visibility: visible;">2500</span></h3>
-                    <div class="d-flex align-items-center justify-content-between mt-1">
-                        <p class="mb-0">Total Revenue</p>
-                        <span class="text-info">55%</span>
-                    </div>
-                    <div class="iq-progress-bar bg-info-light mt-2">
-                        <span class="bg-info iq-progress progress-1" data-percent="55" style="transition: width 2s; width: 55%;"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<style>
+
+</style>
+
+<div class="dashboard-summary">
+	<div class="dashboard-card">
+		<i class="ri-file-list-line dashboard-icon"></i>
+		<span>Số công việc</span>
+		<h2>@Model.CountTask</h2>
+	</div>
+	<div class="dashboard-card">
+		<i class="ri-loop-right-line dashboard-icon"></i>
+		<span>Công việc đang xử lý</span>
+		<h2>@Model.CountTaskInProcess</h2>
+	</div>
+	<div class="dashboard-card">
+		<i class="ri-checkbox-circle-line dashboard-icon"></i>
+		<span>Công việc đã hoàn thành</span>
+		<h2>@Model.CountTaskDone</h2>
+	</div>
+	<div class="dashboard-card">
+		<i class="ri-folder-line dashboard-icon"></i>
+		<span>Dự án</span>
+		<h2>@Model.CountProject</h2>
+	</div>
+	<div class="dashboard-card">
+		<i class="ri-user-3-line dashboard-icon"></i>
+		<span>Người dùng</span>
+		<h2>@Model.CountUser</h2>
+	</div>
+</div>
+
+<div class="dashboard-main">
+	<div class="dashboard-charts">
+		<div class="dashboard-chart">
+			<h3>Trạng thái công việc</h3>
+			<canvas id="tasksStatusChart"></canvas>
+		</div>
+		<div class="dashboard-chart" >
+			<h3>Số lượng công việc</h3>
+			<canvas id="tasksProjectChart"></canvas>
+		</div>
+	</div>
+
+	<div class="dashboard-actions">
+		<a href ="/Task/Index?popup=add" class="dashboard-button">
+			<i class="ri-add-circle-line"></i> Thêm công việc
+		</a>
+		<a href="/Project/Index?popup=add" class="dashboard-button">
+			<i class="ri-file-add-line"></i> Thêm dự án
+		</a>
+
+
+		<div class="dashboard-comments">
+			<h3>Bình luận Mới Nhất</h3>
+			<div id="latest-comments-list" class="comments-list">
+				
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="dashboard-lists">
+	<div class="dashboard-list">
+		<h3>Công việc sắp hết hạn</h3>
+		<ul>
+			@foreach (var task in Model.ListDeadlines)
+			{
+				int daysLeft = task.DueDate.HasValue ? (DateTime.Now - task.DueDate.Value).Days : 0;
+				string displayText = "";
+				string dueDateClass = "task-due-date";
+
+				if (daysLeft > 0)
+				{
+					displayText = $"Trễ {daysLeft} ngày";
+					dueDateClass += " overdue";
+				}
+				else if (daysLeft < 0)
+				{
+					displayText = $"Còn {-daysLeft} ngày";
+					dueDateClass += " upcoming";
+				}
+				else
+				{
+					displayText = "Hôm nay";
+					dueDateClass += " today";
+				}
+				<li>
+					<a href="/Task/Index?IdTaskRedirect=@task.Id" class="task-link"> 📝@task.Title</a>
+					<span class="@dueDateClass">@displayText</span>
+				</li>
+			}
+		</ul>
+	</div>
+	<div class="dashboard-list">
+		<h3>Công việc vừa tạo</h3>
+		<ul>
+			@foreach (var task in Model.ListRecently)
+			{
+				<li>
+					<a href="/Task/Index?IdTaskRedirect=@task.Id" class="task-link">📝@task.Title</a>
+					@if (task.CreatedAt.HasValue)
+					{
+						<span class="created-time" data-created-at="@task.CreatedAt.Value.ToString("yyyy-MM-ddTHH:mm:ss")"></span>
+					}
+					else
+					{
+						<span class="created-time"></span>
+					}
+				</li>
+			}
+		</ul>
+	</div>
 </div>
 
 
+@section Scripts {
+
+	<script>
+		function loadTaskStatusChart() {
+			fetch('/Home/GetTaskStatusData')
+				.then(response => response.json())
+				.then(data => {
+					const ctxStatus = document.getElementById('tasksStatusChart').getContext('2d');
+					new Chart(ctxStatus, {
+						type: 'pie',
+						data: {
+							labels: data.labels,
+							datasets: [{
+								label: 'Trạng thái công việc',
+								data: data.values,
+								backgroundColor: ['#007bff', '#ffc107', '#28a745'],
+								borderWidth: 1
+							}]
+						},
+						options: {
+							responsive: true,
+							plugins: {
+								legend: {
+									position: 'bottom'
+								}
+							}
+						}
+					});
+				});
+		}
+
+		function loadTasksByProjectChart() {
+			fetch('/Home/GetTasksByProjectData')
+				.then(response => response.json())
+				.then(data => {
+					const ctxProject = document.getElementById('tasksProjectChart').getContext('2d');
+					new Chart(ctxProject, {
+						type: 'bar',
+						data: {
+							labels: data.labels,
+							datasets: [{
+								label: 'Số lượng công việc',
+								data: data.values,
+								backgroundColor: '#4facfe'
+							}]
+						},
+						options: {
+							responsive: true,
+							scales: {
+								y: {
+									beginAtZero: true
+								}
+							}
+						}
+					});
+				});
+		}
+
+		function loadLatestComments() {
+			fetch('/Home/GetLatestComments')
+				.then(response => response.json())
+				.then(data => {
+					const commentsList = document.getElementById('latest-comments-list');
+					commentsList.innerHTML = '';
+
+					data.comments.forEach(comment => {
+						const commentItem = document.createElement('div');
+						commentItem.classList.add('comment-item');
+
+						const fullContent = comment.Content;
+						const isLong = fullContent.length > 100;
+						const shortContent = isLong ? fullContent.substring(0, 100) : fullContent;
+
+						const contentDiv = document.createElement('div');
+						contentDiv.classList.add('comment-text');
+
+						const dots = document.createElement('span');
+						dots.textContent = '... ';
+
+						const viewMore = document.createElement('span');
+						viewMore.classList.add('view-more');
+						viewMore.textContent = 'Xem thêm';
+						viewMore.style.cursor = 'pointer';
+						viewMore.style.color = '#007bff';
+						viewMore.style.fontSize = '13px';
+
+						function updateContent(isExpanded) {
+							contentDiv.innerHTML = '';
+							if (isExpanded) {
+								contentDiv.textContent = fullContent;
+								const collapseBtn = document.createElement('span');
+								collapseBtn.classList.add('view-more');
+								collapseBtn.textContent = ' Thu gọn';
+								collapseBtn.style.cursor = 'pointer';
+								collapseBtn.style.color = '#007bff';
+								collapseBtn.style.fontSize = '13px';
+								collapseBtn.addEventListener('click', function () {
+									updateContent(false);
+								});
+								contentDiv.appendChild(collapseBtn);
+							} else {
+								contentDiv.textContent = shortContent;
+								contentDiv.appendChild(dots);
+								contentDiv.appendChild(viewMore);
+							}
+						}
+
+						viewMore.addEventListener('click', function () {
+							updateContent(true);
+						});
+
+						if (isLong) {
+							contentDiv.textContent = shortContent;
+							contentDiv.appendChild(dots);
+							contentDiv.appendChild(viewMore);
+						} else {
+							contentDiv.textContent = fullContent;
+						}
+
+						commentItem.innerHTML = `
+							<div class="comment-author">${comment.UserName}</div>
+								<div class="comment-task">
+								<a href="/Task/Index?IdTaskRedirectCmt=${comment.TaskId}" style="text-decoration: none; color: #007bff;">
+									📝 ${comment.TaskName}
+								</a>
+							</div>
+						`;
+						commentItem.appendChild(contentDiv);
+
+						const timeDiv = document.createElement('div');
+						timeDiv.classList.add('comment-time');
+						timeDiv.textContent = new Date(comment.CreatedAt).toLocaleString();
+						commentItem.appendChild(timeDiv);
+
+						commentsList.appendChild(commentItem);
+					});
+				})
+				.catch(error => {
+					console.error('Error loading comments:', error);
+				});
+		}
+
+
+		document.addEventListener('DOMContentLoaded', function () {
+			loadTaskStatusChart();
+			loadTasksByProjectChart();
+			loadLatestComments();
+		});
+
+
+		document.addEventListener("DOMContentLoaded", function () {
+			const createdTimeElements = document.querySelectorAll('.created-time');
+
+			createdTimeElements.forEach(function (element) {
+				const createdAt = new Date(element.getAttribute('data-created-at'));
+				const now = new Date();
+
+				if (isNaN(createdAt.getTime())) {
+					element.textContent = "";
+					return;
+				}
+
+				const timeDifference = now - createdAt;
+
+				const minutes = Math.floor(timeDifference / (1000 * 60));
+				const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+				const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+
+				let displayText = "";
+
+				if (minutes < 60) {
+					displayText = `${minutes} phút trước`;
+				} else if (hours < 24) {
+					displayText = `${hours} giờ trước`;
+				} else {
+					displayText = `${days} ngày trước`;
+				}
+
+				element.textContent = `${displayText}`;
+			});
+		});
+
+	</script>
 
 
 
 
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
-
-
-
-
-
-
-@* <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary mb-0">📊 Dashboard</h2>
-        <a href="/Project/Index" class="btn btn-outline-primary">
-            🔍 Xem tất cả dự án
-        </a>
-    </div>
-
-
-
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card border-start border-primary border-5 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">📁 Dự án</h5>
-                    <p class="card-text fs-4">@ViewBag.ProjectCount</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card border-start border-success border-5 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">📌 Nhiệm vụ</h5>
-                    <p class="card-text fs-4">@ViewBag.TaskCount</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card border-start border-warning border-5 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">👤 Người dùng</h5>
-                    <p class="card-text fs-4">@ViewBag.UserCount</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card border-start border-info border-5 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">💬 Bình luận</h5>
-                    <p class="card-text fs-4">@ViewBag.CommentCount</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card border-start border-danger border-5 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">📎 Tập tin đính kèm</h5>
-                    <p class="card-text fs-4">@ViewBag.AttachmentCount</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> *@
-
+}

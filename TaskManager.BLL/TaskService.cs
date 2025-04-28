@@ -68,6 +68,10 @@ namespace TaskManager.BLL
         {
             return _repo.DeleteAttachment(attachment);
         }
+        public List<CommentViewModel> GetAllCommentsByIdUser(TaskParam param)
+        {
+             return _repo.GetAllCommentsByIdUser(param);
+        }
         #endregion
 
         #region CRUD
