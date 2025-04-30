@@ -6,17 +6,20 @@ namespace TaskManager.Controllers
 {
     public class TaskController : Controller
     {
-
+        #region Khởi tạo
         private readonly TaskService _taskService;
         private readonly ProjectService _projectService;
         private readonly UserService _userService;
-
+      
         public TaskController(TaskService taskService, ProjectService projectService, UserService userService)
         {
             _taskService = taskService;
             _projectService = projectService;
             _userService = userService;
         }
+        #endregion
+
+        #region Công việc
         public IActionResult Index()
         {
             var currentUser = CookieHelper.GetLoggedUser(User);
@@ -126,6 +129,32 @@ namespace TaskManager.Controllers
                 return Json(new { success = true });
             return Json(new { success = false, error = "Không có thay đổi" });
         }
+        [HttpPost]
+        public JsonResult EditWithId(TaskItem taskItem)
+        {
+            if (string.IsNullOrEmpty(taskItem.Notes))
+            {
+                return Json(new { success = false, error = "Ghi chú không được để trống" });
+            }
+            if (taskItem.Id <= 0)
+            {
+                return Json(new { success = false, error = "Không tìm thấy công việc" });
+            }
+
+            var taskUpdate = _taskService.GetTask(taskItem.Id);
+            taskUpdate.Status = taskItem.Status;
+            taskUpdate.Notes = taskItem.Notes;
+            taskUpdate.UpdatedAt = DateTime.Now;
+
+            var res = _taskService.UpdateTask(taskUpdate);
+            if (res > 0)
+            {
+                return Json(new { success = true, data = new { Id = taskItem.Id, Status = taskItem.Status } });
+            }
+            return Json(new { success = false, error = "Không có thay đổi" });
+        }
+
+
         [HttpGet]
         public IActionResult GetTaskById(int id)
         {
@@ -315,8 +344,100 @@ namespace TaskManager.Controllers
             return Json(new { success = false, error = "Có lỗi xảy ra khi xoá đính kèm." });
         }
 
+        #endregion
+
+        #region Lịch
+        public IActionResult Calendar()
+        {
+
+            var currentUser = CookieHelper.GetLoggedUser(User);
+            if (currentUser == null)
+                return RedirectToAction("Login", "User");
+
+            var lstProjectName = _projectService.GetAllProjectByUser(currentUser.Id);
+            ViewBag.ListProject = lstProjectName;
+
+            var curentDate = DateTime.Now;
+
+            TaskParam param = new TaskParam();
+            param.IdUser = currentUser.Id;
+            param.RoleUser = currentUser.Role;
+
+            var lsttask = _taskService.GetAllTaskNotDone(param);
 
 
+            var events = lsttask
+             .Where(t => t.DueDate.HasValue && t.DueDate.Value.Month == curentDate.Month)
+             .Select(t => new CalendarEvent
+             {
+                 IdTask = t.Id,
+                 Title = t.Title,
+                 StartDate = t.DueDate ?? DateTime.MinValue,
+                 ColorClass = t.Status switch
+                 {
+                     0 => "calendar-event-new",
+                     1 => "calendar-event-process",
+                     2 => "calendar-event-done",
+                     _ => "calendar-event-default"
+                 }
+             })
+             .ToList();
+
+            var viewModel = new CalendarEventViewModel
+            {
+                StartDate = new DateTime(curentDate.Year, curentDate.Month, 1),
+                Events = events
+            };
+
+            return View(viewModel);
+        }
+        [HttpGet]
+        public IActionResult GetCalendarEventsByMonth(CalendarParam param)
+        {
+
+            var currentUser = CookieHelper.GetLoggedUser(User);
+            if (currentUser == null)
+                return RedirectToAction("Login", "User");
+
+            var lstProjectName = _projectService.GetAllProjectByUser(currentUser.Id);
+            ViewBag.ListProject = lstProjectName;
+
+            var curentDate = DateTime.Now;
+
+            TaskParam tparam = new TaskParam();
+            tparam.IdUser = currentUser.Id;
+            tparam.RoleUser = currentUser.Role;
+            tparam.IdProject = param.IdProject;
+
+            var lsttask = _taskService.GetListTask(tparam);
+
+            var events = lsttask
+             .Where(t => t.DueDate.HasValue && t.DueDate.Value.Month == param.month && t.DueDate.Value.Year == param.year)
+             .Select(t => new CalendarEvent
+             {
+                 IdTask = t.Id,
+                 Title = t.Title,
+                 StartDate = t.DueDate ?? DateTime.MinValue,
+                 ColorClass = t.Status switch
+                 {
+                     0 => "calendar-event-new",
+                     1 => "calendar-event-process",
+                     2 => "calendar-event-done",
+                     _ => "calendar-event-default"
+                 }
+             })
+             .ToList();
+
+            var viewModel = new CalendarEventViewModel
+            {
+                StartDate = new DateTime(param.year, param.month, 1),
+                Events = events
+            };
+
+            return PartialView("_FilterCalendar", viewModel);
+        }
+
+        #endregion
 
     }
 }

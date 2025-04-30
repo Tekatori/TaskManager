@@ -59,4 +59,25 @@ namespace TaskManager.DAL.ViewModel
         public List<TaskItem> ListDeadlines { get; set; } = new List<TaskItem>();
         public List<TaskItem> ListRecently  { get; set; } = new List<TaskItem>();
     }
+    public class CalendarEvent
+    {
+        public string Title { get; set; }
+        public DateTime StartDate { get; set; }
+        public string ColorClass { get; set; }
+        
+        public int IdTask { get; set; }
+    }
+    public class CalendarEventViewModel
+    {
+        public DateTime StartDate { get; set; } 
+        public List<CalendarEvent> Events { get; set; }
+    }
+
+    public class CalendarParam
+    {
+        public int month { get; set; } = 0;
+        public int year { get; set; } = 0;
+        public int? IdProject { get; set; }
+    }
+
 }
