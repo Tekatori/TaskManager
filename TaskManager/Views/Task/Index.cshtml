@@ -101,7 +101,7 @@
     </div>
     <div class="col-lg-12" id="task-container">
         <div class="card">
-            <div class="card-body" >
+            <div class="card-body" id="taskListContainer">
                 @Html.Partial("_TaskListPartial", Model)
             </div>
         </div>
@@ -418,7 +418,6 @@
 </div>
 
 
-
 @section Scripts {
     <script>
         $(document).ready(function () {
@@ -458,16 +457,10 @@
                         contentType: false, 
                         success: function (res) {
                             if (res.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Đã thêm công việc',
-                                    text: 'Trang sẽ tự làm mới...',
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
+                                  $('#new-task-modal').modal('hide');
+                                  doFilterTasks();
+                                  showAlert('Đã thêm công việc', 'success');
+                              } else {
                                 showAlert('Có lỗi xảy ra khi gửi dữ liệu.', 'error');
                             }
                         },
@@ -495,15 +488,10 @@
 
                 $.post('/Task/Edit', data, function (res) {
                     if (res.success) {
-                          Swal.fire({
-                                    icon: 'success',
-                                    title:'Đã cập nhật trạng thái',
-                                    text: 'Trang sẽ tự làm mới...',
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
+                         $('#edit-task-modal').modal('hide');
+                         doFilterTasks();
+                         showAlert('Đã cập nhật trạng thái', 'success');
+
                     } else {
                         showAlert(res.error || 'Không thể cập nhật', 'error');
                     }
@@ -559,7 +547,7 @@
                         $('#editNotes').val(task.Notes);
                         $('#edit-task-modal').modal('show');
                     } else {
-                             showAlert(res.error || 'Không thể lấy dữ liệu.', 'error');
+                        showAlert(res.error || 'Không thể lấy dữ liệu.', 'error');
                     }
                 },
                 error: function () {
@@ -586,14 +574,9 @@
                         data: { id: TaskId },
                         success: function (res) {
                             if (res.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Đã xóa công việc!',
-                                    timer: 1000,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
+                               showAlert('Đã xóa công việc', 'success');
+                                doFilterTasks();
+
                             } else {
                                showAlert(res.error || 'Không thể xóa.', 'error');
                             }
@@ -1063,11 +1046,11 @@
                     IdProject: projectId
                 },
                 success: function (html) {
-                    $('#task-container').html(html);
+                     $('#task-container').html(html);
                 },
                 error: function () {
                     showAlert('Lỗi khi lọc công việc.', 'error');
-                }
+                },
             });
         }
 

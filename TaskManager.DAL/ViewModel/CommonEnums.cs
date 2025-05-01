@@ -34,13 +34,13 @@ namespace TaskManager.Models
         }
         public enum Role
         {
-            [Description("User")]
+            [Description("Người dùng")]
             User = 0,
 
-            [Description("Admin")]
+            [Description("Quản trị viên")]
             Admin = 1,
 
-            [Description("Leader")]
+            [Description("Quản lý")]
             Leader = 2
         }
         public static string GetDescription(this Enum value)

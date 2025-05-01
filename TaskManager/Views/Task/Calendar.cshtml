@@ -147,7 +147,8 @@
 			const btnNext = document.getElementById('btnNext');
 			const calendarMonthYear = document.getElementById('calendarMonthYear');
 			const selectedProjectElement = document.getElementById('selectedProject');
-			let currentDate = new Date(); 
+			let currentDate = new Date();
+			let selectedProjectId = null;
 
 			function updateCalendarMonthYear() {
 				const monthNames = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
@@ -180,7 +181,7 @@
 			btnToday.addEventListener('click', function () {
 				currentDate = new Date(); 
 				updateCalendarMonthYear();
-				loadCalendarData(); 
+				loadCalendarData(selectedProjectId);
 			});
 
 
@@ -188,7 +189,7 @@
 				currentDate.setDate(1);
 				currentDate.setMonth(currentDate.getMonth() - 1); 
 				updateCalendarMonthYear();
-				loadCalendarData(); 
+				loadCalendarData(selectedProjectId);
 			});
 
 
@@ -196,13 +197,14 @@
 				currentDate.setDate(1);
 				currentDate.setMonth(currentDate.getMonth() + 1);
 				updateCalendarMonthYear();
-				loadCalendarData(); 
+				loadCalendarData(selectedProjectId);
 			});
 
 
 			document.querySelectorAll('.project-option').forEach(function (option) {
 				option.addEventListener('click', function () {
 					const projectId = this.getAttribute('data-id');
+					selectedProjectId = projectId === "0" ? null : projectId;
 					selectedProjectElement.innerHTML = '<i class="bi bi-folder mr-2"></i>' + this.getAttribute('data-name');
 					loadCalendarData(projectId === "0" ? null : projectId);
 				});
@@ -232,6 +234,8 @@
 				}
 
 				$('#dropdownMenuButton03').dropdown('toggle');
+				$('.project-option').removeClass('active');
+				$(this).addClass('active');
 			});
 
 
@@ -271,17 +275,8 @@
 									break;
 							}
 						}
-
-						Swal.fire({
-							icon: 'success',
-							title: 'Đã cập nhật trạng thái',
-							text: 'Cập nhật thành công!',
-							timer: 1500,
-							showConfirmButton: false
-						}).then(() => {
-							
-							$('#edit-task-modal').modal('hide');
-						});
+						showAlert('Cập nhật trạng thái thành công!', 'success');
+						$('#edit-task-modal').modal('hide');
 					} else {
 						showAlert(res.error || 'Không thể cập nhật', 'error');
 					}

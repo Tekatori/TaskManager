@@ -1,0 +1,93 @@
+﻿@using TaskManager.DAL.ViewModel
+@model List<TeamGroupViewModel>
+
+
+<div id="grid" class="item-content animate__animated animate__fadeIn active" data-toggle-extra="tab-content">
+    <div class="row">
+        @if (!Model.Any())
+        {
+            <div class="col-lg-12 col-md-12">
+                <H3 class="text-center text-muted"><i class="ri-information-line mr-2"></i> Không tìm thấy nhóm</H3>
+            </div>
+        }
+        else
+        {
+            @foreach (var team in Model)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="card-transparent card-block card-stretch card-height">
+                        <div class="card-body text-center p-0">
+                            <div class="item">
+                                <div class="odr-img">
+                                    <img src="/img/11539820.png" class="img-fluid rounded-circle avatar-90 m-auto" alt="image">
+                                </div>
+                                <div class="odr-content rounded">
+                                    <h4 class="mb-2">@team.Name</h4>
+                                    <p class="mb-3">Leader: @team.CreatedByName</p>
+                                    <ul class="list-unstyled mb-3">
+                                        <li class="bg-secondary-light rounded-circle iq-card-icon-small mr-4"> <a title="Chi tiết" href="javascript:void(0)" onclick="showTeamDesc('@team.Name', `@team.Description`)"> <i class="ri-file-text-line m-0"></i> </a> </li>
+                                        <li class="bg-primary-light rounded-circle iq-card-icon-small mr-4"> <a title="Danh sách thành viên" href="javascript:void(0)" onclick="showTeamMembers('@team.Id')"> <i class="ri-group-line m-0"></i></a> </li>
+                                        <li class="bg-success-light rounded-circle iq-card-icon-small mr-4"><a title="Thêm thành viên" href="javascript:void(0)" onclick="openAddMemberModal('@team.Id')">  <i class="ri-user-add-line m-0"></i>  </a></li>
+                                        <li class="bg-danger-light rounded-circle iq-card-icon-small">
+                                            <a title="Xoá nhóm" href="javascript:void(0)" onclick="confirmDelete('@team.Id')">
+                                                <i class="ri-delete-bin-line m-0"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    @*  <div class="pt-3 border-top">
+                                            <a href="#" class="btn btn-primary"><i class="bi bi-plus-circle"></i>Thêm thành viên</a>
+                                        </div> *@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+    </div>
+</div>
+<div id="list" class="item-content animate__animated animate__fadeIn" data-toggle-extra="tab-content">
+    <div class="table-responsive rounded bg-white mb-4">
+        <table class="table mb-0 table-borderless tbl-server-info">
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            <H3 class="text-center text-muted"><i class="ri-information-line mr-2"></i> Không tìm thấy nhóm</H3>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var team in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="media align-items-center">
+                                    <img src="/img/11539820.png" class="img-fluid rounded-circle avatar-40" alt="image">
+                                    <h5 class="ml-3">@team.Name</h5>
+                                </div>
+                            </td>
+                            <td>Leader: @team.CreatedByName</td>
+                            @*  <td>
+                                    <a href="#" class="btn btn-primary"><i class="bi bi-plus-circle"></i>Thêm thành viên</a>
+                                </td> *@
+                            <td>
+                                <div class="media align-items-center">
+                                    <a title="Chi tiết" href="javascript:void(0)" onclick="showTeamDesc('@team.Name', `@team.Description`)" class="bg-secondary-light rounded-circle iq-card-icon-small mr-3"><i class="ri-file-text-line m-0"></i></a>
+                                    <a title="Danh sách thành viên" href="javascript:void(0)" onclick="showTeamMembers('@team.Id')" class="bg-primary-light rounded-circle iq-card-icon-small mr-3"><i class="ri-group-line m-0"></i></a>
+                                    <a title="Thêm thành viên" href="javascript:void(0)" onclick="openAddMemberModal('@team.Id')" class="bg-success-light rounded-circle iq-card-icon-small mr-3"><i class="ri-user-add-line m-0"></i></a>
+                                    <a title="Xoá nhóm" href="javascript:void(0)" onclick="confirmDelete('@team.Id')" class="bg-success-light rounded-circle iq-card-icon-small"><i class="ri-delete-bin-line m-0"></i></a>
+                                </div>
+                            </td>
+
+
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

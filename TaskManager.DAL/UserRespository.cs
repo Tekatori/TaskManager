@@ -139,7 +139,35 @@ namespace TaskManager.DAL
         {
             return SaveUsertoTeamGroup(pUserIds, pTeamGroupId);
         }
+        public int UpdateRoleUser(int? pIdUser, int? pRole)
+        {
+            int res = 0;
+            if (!pIdUser.HasValue || !pRole.HasValue)
+                return res;
 
+            var findus = _context.Users.FirstOrDefault(t => t.Id == pIdUser);
+            if (findus != null)
+            {
+                findus.Role = pRole;
+                res = _context.SaveChanges();
+            }
+            return res;
+        }
+        public int ChangePassWord(int? pIdUser, string pPasswordNewHash)
+        {
+            int res = 0;
+            if (!pIdUser.HasValue || string.IsNullOrEmpty(pPasswordNewHash))
+                return res;
+
+            var us = _context.Users.FirstOrDefault(t => t.Id == pIdUser);
+
+            if (us != null)
+            {
+                us.PasswordHash = pPasswordNewHash;
+                res = _context.SaveChanges();
+            }
+            return res;
+        }
         #endregion
 
         #region Private
@@ -214,7 +242,7 @@ namespace TaskManager.DAL
             teamGroup.ListIdUser = string.Join(",", mergedIds);
             return _context.SaveChanges();
         }
-
+  
         #endregion
     }
 }

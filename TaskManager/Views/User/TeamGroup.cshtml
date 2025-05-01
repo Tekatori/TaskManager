@@ -13,9 +13,6 @@
             <div class="card-body">
                 <div class="d-flex flex-wrap align-items-center justify-content-between breadcrumb-content">
                     <h5><i class="bi bi-people-fill mr-2"></i>Danh sách nhóm</h5>
-
-
-
                     <div class="d-flex align-items-center">
                         <div class="list-grid-toggle d-flex align-items-center mr-3">
                             <div data-toggle-extra="tab" data-target-extra="#grid" class="active">
@@ -40,7 +37,7 @@
                             </div>
                         </div>
                         <div class="pl-3 border-left btn-new">
-                            <a title="Tạo nhóm" href="javascript:void(0)" class="btn btn-primary" data-target="#new-user-modal" data-toggle="modal"><i class="bi bi-plus-circle"></i> Tạo nhóm</a>
+                            <a title="Tạo nhóm" href="javascript:void(0)" onclick="openAddModal()" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Tạo nhóm</a>
                         </div>
                     </div>
                 </div>
@@ -48,100 +45,13 @@
         </div>
     </div>
 </div>
-<div id="grid" class="item-content animate__animated animate__fadeIn active" data-toggle-extra="tab-content">
-    <div class="row">
-        @if (!Model.Any())
-        {
-            <div class="col-lg-12 col-md-12">
-                <H3 class="text-center text-muted"><i class="ri-information-line mr-2"></i> Không tìm thấy nhóm</H3>
-            </div>
-        }
-        else
-        {
-            @foreach (var team in Model)
-            {
-                <div class="col-lg-4 col-md-6">
-                    <div class="card-transparent card-block card-stretch card-height">
-                        <div class="card-body text-center p-0">
-                            <div class="item">
-                                <div class="odr-img">
-                                    <img src="/img/11539820.png" class="img-fluid rounded-circle avatar-90 m-auto" alt="image">
-                                </div>
-                                <div class="odr-content rounded">
-                                    <h4 class="mb-2">@team.Name</h4>
-                                    <p class="mb-3">Leader: @team.CreatedByName</p>
-                                    <ul class="list-unstyled mb-3">
-                                        <li class="bg-secondary-light rounded-circle iq-card-icon-small mr-4"> <a title="Chi tiết" href="javascript:void(0)" onclick="showTeamDesc('@team.Name', `@team.Description`)"> <i class="ri-file-text-line m-0"></i> </a> </li>
-                                        <li class="bg-primary-light rounded-circle iq-card-icon-small mr-4"> <a title="Danh sách thành viên" href="javascript:void(0)" onclick="showTeamMembers('@team.Id')"> <i class="ri-group-line m-0"></i></a> </li>
-                                        <li class="bg-success-light rounded-circle iq-card-icon-small mr-4"><a title="Thêm thành viên" href="javascript:void(0)" onclick="openAddMemberModal('@team.Id')">  <i class="ri-user-add-line m-0"></i>  </a></li>
-                                        <li class="bg-danger-light rounded-circle iq-card-icon-small">
-                                            <a title="Xoá nhóm" href="javascript:void(0)" onclick="confirmDelete('@team.Id')">
-                                                <i class="ri-delete-bin-line m-0"></i>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                   @*  <div class="pt-3 border-top">
-                                        <a href="#" class="btn btn-primary"><i class="bi bi-plus-circle"></i>Thêm thành viên</a>
-                                    </div> *@
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-        }
 
-    </div>
-</div>
-<div id="list" class="item-content animate__animated animate__fadeIn" data-toggle-extra="tab-content">
-    <div class="table-responsive rounded bg-white mb-4">
-        <table class="table mb-0 table-borderless tbl-server-info">
-            <tbody>
-                @if (!Model.Any())
-                {
-                    <tr>
-                        <td colspan="5" class="text-center">
-                            <H3 class="text-center text-muted"><i class="ri-information-line mr-2"></i> Không tìm thấy nhóm</H3>
-                        </td>
-                    </tr>
-                }
-                else
-                {
-                    @foreach (var team in Model)
-                    {
-                        <tr>
-                            <td>
-                                <div class="media align-items-center">
-                                    <img src="/img/11539820.png" class="img-fluid rounded-circle avatar-40" alt="image">
-                                    <h5 class="ml-3">@team.Name</h5>
-                                </div>
-                            </td>
-                            <td>Leader: @team.CreatedByName</td>
-                           @*  <td>
-                                <a href="#" class="btn btn-primary"><i class="bi bi-plus-circle"></i>Thêm thành viên</a>
-                            </td> *@
-                            <td>
-                                <div class="media align-items-center">
-                                    <a title="Chi tiết" href="javascript:void(0)" onclick="showTeamDesc('@team.Name', `@team.Description`)" class="bg-secondary-light rounded-circle iq-card-icon-small mr-3"><i class="ri-file-text-line m-0"></i></a>
-                                    <a title="Danh sách thành viên" href="javascript:void(0)" onclick="showTeamMembers('@team.Id')" class="bg-primary-light rounded-circle iq-card-icon-small mr-3"><i class="ri-group-line m-0"></i></a>
-                                    <a title="Thêm thành viên" href="javascript:void(0)" onclick="openAddMemberModal('@team.Id')" class="bg-success-light rounded-circle iq-card-icon-small mr-3"><i class="ri-user-add-line m-0"></i></a>
-                                    <a title="Xoá nhóm" href="javascript:void(0)" onclick="confirmDelete('@team.Id')" class="bg-success-light rounded-circle iq-card-icon-small"><i class="ri-delete-bin-line m-0"></i></a>
-                                </div>
-                            </td>
-                      
-                           
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
-    </div>
+<div id="teamgroup-container">
+    @Html.Partial("_ListTeamGroup", Model)
 </div>
 
 
-
-
-<div class="modal fade bd-example-modal-lg" role="dialog" aria-modal="true" id="new-user-modal">
+<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-modal="true" id="new-user-modal">
 	<div class="modal-dialog  modal-dialog-centered modal-lg" role="document">
 		<form id="teamGroupForm">
 			<div class="modal-content">
@@ -170,7 +80,7 @@
 						<div class="col-lg-12">
 							<div class="d-flex flex-wrap align-items-ceter justify-content-center mt-2">
                                 <button type="submit" class="btn btn-primary mr-3"><i class="fas fa-save"></i>Lưu</button>
-                                <div class="btn btn-secondary" data-dismiss="modal"><i class="bi bi-x-circle"></i>Đóng</div>
+                                <div class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i>Đóng</div>
 							</div>
 						</div>
 					</div>
@@ -252,6 +162,7 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+            
             $('[data-bs-toggle="tooltip"]').tooltip();
 
             $('#teamGroupForm').submit(function (e) {
@@ -268,21 +179,25 @@
 
                 $.post('/User/CreateTeamGroup', data, function (res) {
                     if (res.success) {
-                         Swal.fire({
-                                    icon: 'success',
-                                    title:'Đã thêm nhóm',
-                                    text: 'Trang sẽ tự làm mới...',
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
+                        showAlert('Đã thêm nhóm', 'success');
+                        $('#new-user-modal').modal('hide');
+                        $('#teamgroup-container').load('/User/GetListTeamGroup', function () {
+                             let currentView = $('.list-grid-toggle > div.active').data('target-extra');
+                              restoreProjectView(currentView);
+                         });                                  
                     } else {
-                        Swal.fire('Lỗi', res.error || 'Không thể thêm', 'error');
+                        showAlert(res.error || 'Không thể thêm', 'error');
                     }
                 });
             });     
         });
+
+        function openAddModal() {
+            $('#Name').val('');
+            $('#Description').val('');
+            $('#new-user-modal').modal('show');
+        }
+
 
         function showTeamDesc(title, desc) {
             $('#teamModalTitle').text("Mô tả nhóm: " + title);
@@ -309,20 +224,17 @@
                         data: { Id: GroupId },
                         success: function (res) {
                             if (res.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Đã xóa nhóm!',
-                                    timer: 1000,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
+                               showAlert('Đã xóa nhóm', 'success');
+                               $('#teamgroup-container').load('/User/GetListTeamGroup', function () {
+                                   let currentView = $('.list-grid-toggle > div.active').data('target-extra');
+                                   restoreProjectView(currentView);
+                               });                              
                             } else {
-                                Swal.fire('Lỗi', res.error || 'Không thể xóa.', 'error');
+                               showAlert(res.error || 'Không thể xóa.', 'error');
                             }
                         },
                         error: function () {
-                            Swal.fire('Lỗi', 'Không thể kết nối server.', 'error');
+                            showAlert('Không thể kết nối server.', 'error');
                         }
                     });
                 }
@@ -358,11 +270,11 @@
                         $('#user-list').html(html);
                         $('#addMemberModal').modal('show');
                     } else {
-                        Swal.fire('Lỗi', res.message || 'Không thể tải người dùng.', 'error');
+                        showAlert(res.message || 'Không thể tải người dùng.', 'error');
                     }
                 },
                 error: function () {
-                    Swal.fire('Lỗi', 'Không thể kết nối đến máy chủ.', 'error');
+                   showAlert('Không thể kết nối đến máy chủ.', 'error');
                 }
             });
         }
@@ -394,7 +306,7 @@
             });
 
             if (selectedUserIds.length === 0) {
-                Swal.fire('Chưa chọn ai', 'Vui lòng chọn ít nhất một người dùng.', 'warning');
+                showAlert('Vui lòng chọn ít nhất một người dùng', 'warning');
                 return;
             }
 
@@ -405,23 +317,18 @@
                 data: { teamId: teamId, userIds: selectedUserIds },
                 success: function (res) {
                     if (res.success) {
-                        Swal.fire({
-                                    icon: 'success',
-                                    title:'Đã thêm các thành viên',
-                                    text: 'Trang sẽ tự làm mới...',
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
-
+                        showAlert('Đã thêm các thành viên', 'success');
+                        $('#teamgroup-container').load('/User/GetListTeamGroup', function () {
+                                          let currentView = $('.list-grid-toggle > div.active').data('target-extra');
+                                          restoreProjectView(currentView);
+                                    });
                         $('#addMemberModal').modal('hide');
                     } else {
-                        Swal.fire('Lỗi', res.message || 'Không thể thêm thành viên.', 'error');
+                        showAlert(res.message || 'Không thể thêm thành viên.', 'error');
                     }
                 },
                 error: function () {
-                    Swal.fire('Lỗi', 'Không thể kết nối đến máy chủ.', 'error');
+                     showAlert('Không thể kết nối đến máy chủ.', 'error');
                 }
             });
         }
@@ -443,15 +350,21 @@
                                 </li>`;
                         });
                         $('#team-members-list').html(html);
-                        $('#teamMembersModal').modal('show'); // Hiển thị modal
+                        $('#teamMembersModal').modal('show');
                     } else {
-                        Swal.fire('Lỗi', res.message || 'Không thể tải thành viên.', 'error');
+                         showAlert(res.message || 'Không thể tải thành viên.', 'error');
                     }
                 },
                 error: function () {
-                    Swal.fire('Lỗi', 'Không thể kết nối đến máy chủ.', 'error');
+                      showAlert('Không thể kết nối đến máy chủ.', 'error');
                 }
             });
+        }
+        function restoreProjectView(currentView) {
+            $('.list-grid-toggle > div').removeClass('active');
+            $('.list-grid-toggle > div[data-target-extra="' + currentView + '"]').addClass('active');
+            $('[data-toggle-extra="tab-content"]').removeClass('active');
+            $(currentView).addClass('active');
         }
 
 

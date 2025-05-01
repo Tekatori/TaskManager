@@ -95,6 +95,14 @@ namespace TaskManager.BLL
         {
             return _repo.AddUsertoTeamGroup(pUserIds, pTeamGroupId);
         }
+        public int UpdateRoleUser(int? pIdUser, int? pRole)
+        {
+            return _repo.UpdateRoleUser(pIdUser, pRole);
+        }
+        public int ChangePassWord(int? pIdUser, string pPasswordNewHash)
+        {
+            return _repo.ChangePassWord(pIdUser, pPasswordNewHash);
+        }
         #endregion
     }
 }

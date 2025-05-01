@@ -1,172 +1,171 @@
 ﻿@model IEnumerable<TaskManager.Models.Project>
 @using TaskManager.Models;
 @{
-    ViewData["Title"] = "Quản lý Dự án";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    var lstteamGroup = ViewBag.lstteamGroup as List<TaskManager.Models.TeamGroup>;
-    if (lstteamGroup == null)
-    {
-        lstteamGroup = new List<TaskManager.Models.TeamGroup>();
-    }
-    var currentUser = CookieHelper.GetLoggedUser(User);
+	ViewData["Title"] = "Quản lý Dự án";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	var lstteamGroup = ViewBag.lstteamGroup as List<TaskManager.Models.TeamGroup>;
+	if (lstteamGroup == null)
+	{
+		lstteamGroup = new List<TaskManager.Models.TeamGroup>();
+	}
+	var currentUser = CookieHelper.GetLoggedUser(User);
 }
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 <style>
-    .alert-info {
-    background-color: #e9f7fc;
-    color: #2c6e8f;
-    border-radius: 5px;
-    padding: 10px;
-    font-size: 16px;
-    }
+	.alert-info {
+		background-color: #e9f7fc;
+		color: #2c6e8f;
+		border-radius: 5px;
+		padding: 10px;
+		font-size: 16px;
+	}
 
-    .alert-info i {
-    font-size: 18px;
-    vertical-align: middle;
-    }
-
+		.alert-info i {
+			font-size: 18px;
+			vertical-align: middle;
+		}
 
 </style>
 <div class="row">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex flex-wrap align-items-center justify-content-between breadcrumb-content">
-                    <h5>📁 Danh sách Dự án</h5>
-                    <div class="d-flex flex-wrap align-items-center justify-content-between">
-                        <div class="iq-search-bar device-search mr-3">
-                            <form id="Search" class="searchbox">
-                                <button type="submit" class="search-link"><i class="ri-search-line"></i></button>
+	<div class="col-lg-12">
+		<div class="card">
+			<div class="card-body">
+				<div class="d-flex flex-wrap align-items-center justify-content-between breadcrumb-content">
+					<h5>📁 Danh sách Dự án</h5>
+					<div class="d-flex flex-wrap align-items-center justify-content-between">
+						<div class="iq-search-bar device-search mr-3">
+							<form id="Search" class="searchbox">
+								<button type="submit" class="search-link"><i class="ri-search-line"></i></button>
 
-                                <input id="searchtext" maxlength="200" type="text" class="text search-input" placeholder="Tên dự án...">
-                            </form>
-                           
-                        </div>
-                        <div class="nav-item nav-icon search-content mr-3">
-                            <a href="javascript:void(0)" class="search-toggle rounded" id="dropdownSearch" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="ri-search-line"> <span style="color:ActiveCaption">Click ở đây để tìm kiếm</span></i>
-                            </a>
-                            <div class="iq-search-bar iq-sub-dropdown dropdown-menu" aria-labelledby="dropdownSearch">
-                                <form id="SearchMobile" class="searchbox p-2">
-                                    <div class="form-group mb-0 position-relative">
-                                        <input id="searchtext2" maxlength="200" class="text search-input font-size-12" placeholder="Tên công việc...">
-                                        <button type="submit" href="javascript:void(0)" class="search-link"><i class="ri-search-line"></i></button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+								<input id="searchtext" maxlength="200" type="text" class="text search-input" placeholder="Tên dự án...">
+							</form>
+
+						</div>
+						<div class="nav-item nav-icon search-content mr-3">
+							<a href="javascript:void(0)" class="search-toggle rounded" id="dropdownSearch" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<i class="ri-search-line"> <span style="color:ActiveCaption">Click ở đây để tìm kiếm</span></i>
+							</a>
+							<div class="iq-search-bar iq-sub-dropdown dropdown-menu" aria-labelledby="dropdownSearch">
+								<form id="SearchMobile" class="searchbox p-2">
+									<div class="form-group mb-0 position-relative">
+										<input id="searchtext2" maxlength="200" class="text search-input font-size-12" placeholder="Tên dự án...">
+										<button type="submit" href="javascript:void(0)" class="search-link"><i class="ri-search-line"></i></button>
+									</div>
+								</form>
+							</div>
+						</div>
 
 
 
-                        <div class="list-grid-toggle d-flex align-items-center mr-3">
-                            <button type="button" class="btn btn-warning" id="btnClearSearch">
-                                <i class="bi bi-eraser"></i>
-                            </button>
-                        </div>
+						<div class="list-grid-toggle d-flex align-items-center mr-3">
+							<button type="button" class="btn btn-warning" id="btnClearSearch">
+								<i class="bi bi-eraser"></i>
+							</button>
+						</div>
 
-                        <div class="list-grid-toggle d-flex align-items-center mr-3">
-                            <div data-toggle-extra="tab" data-target-extra="#grid" class="active">
-                                <div class="grid-icon mr-3">
-                                    <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="3" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="14" width="7" height="7"></rect>
-                                        <rect x="3" y="14" width="7" height="7"></rect>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div data-toggle-extra="tab" data-target-extra="#list">
-                                <div class="grid-icon">
-                                    <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <line x1="21" y1="10" x2="3" y2="10"></line>
-                                        <line x1="21" y1="6" x2="3" y2="6"></line>
-                                        <line x1="21" y1="14" x2="3" y2="14"></line>
-                                        <line x1="21" y1="18" x2="3" y2="18"></line>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="pl-3 border-left btn-new">
-                            <a href="javascript:void(0)" onclick="openAddModal()" class="btn btn-primary"> ➕ Thêm Dự án</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+						<div class="list-grid-toggle d-flex align-items-center mr-3">
+							<div data-toggle-extra="tab" data-target-extra="#grid" class="active">
+								<div class="grid-icon mr-3">
+									<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<rect x="3" y="3" width="7" height="7"></rect>
+										<rect x="14" y="3" width="7" height="7"></rect>
+										<rect x="14" y="14" width="7" height="7"></rect>
+										<rect x="3" y="14" width="7" height="7"></rect>
+									</svg>
+								</div>
+							</div>
+							<div data-toggle-extra="tab" data-target-extra="#list">
+								<div class="grid-icon">
+									<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<line x1="21" y1="10" x2="3" y2="10"></line>
+										<line x1="21" y1="6" x2="3" y2="6"></line>
+										<line x1="21" y1="14" x2="3" y2="14"></line>
+										<line x1="21" y1="18" x2="3" y2="18"></line>
+									</svg>
+								</div>
+							</div>
+						</div>
+						<div class="pl-3 border-left btn-new">
+							<a href="javascript:void(0)" onclick="openAddModal()" class="btn btn-primary"> ➕ Thêm Dự án</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <div id="project-container">
-    @Html.Partial("_ProjectListPartial", Model)
+	@Html.Partial("_ProjectListPartial", Model)
 </div>
 
 
 <div class="modal fade" role="dialog" aria-modal="true" id="new-project-modal">
-    <div class="modal-dialog  modal-dialog-centered" role="document">
-        <form id="projectForm">
-            <div class="modal-content">
+	<div class="modal-dialog  modal-dialog-centered" role="document">
+		<form id="projectForm">
+			<div class="modal-content">
 
-                <div class="modal-header d-block text-center pb-3 border-bttom">
-                    <h3 class="modal-title" id="projectModalLabel">➕ Thêm Dự án</h3>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <input type="hidden" id="ProjectId" name="Id" />
-                        <input type="hidden" id="OwnerId" name="OwnerId" />
-                        <div class="col-lg-12">
-                            <div class="form-group mb-3">
-                                <label for="Name" class="h5">Tên dự án *</label>
-                                <input type="text" class="form-control" id="Name" name="Name" maxlength="255" required
-                                oninvalid="this.setCustomValidity('Vui lòng nhập tên dự án')"
-                                oninput="this.setCustomValidity('')" />
-                            </div>
-                        </div>
+				<div class="modal-header d-block text-center pb-3 border-bttom">
+					<h3 class="modal-title" id="projectModalLabel">➕ Thêm Dự án</h3>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<input type="hidden" id="ProjectId" name="Id" />
+						<input type="hidden" id="OwnerId" name="OwnerId" />
+						<div class="col-lg-12">
+							<div class="form-group mb-3">
+								<label for="Name" class="h5">Tên dự án *</label>
+								<input type="text" class="form-control" id="Name" name="Name" maxlength="255" required
+									   oninvalid="this.setCustomValidity('Vui lòng nhập tên dự án')"
+									   oninput="this.setCustomValidity('')" />
+							</div>
+						</div>
 
-                        <div class="col-lg-12">
-                            <div class="form-group mb-3">
-                                <label for="Description" class="h5">Mô tả</label>
-                                <textarea class="form-control" id="Description" name="Description" rows="3"></textarea>
-                            </div>
-                        </div>
-                        @if (currentUser != null && (currentUser.Role == (int)CommonEnums.Role.Leader || currentUser.Role == (int)CommonEnums.Role.Admin))
-                        {
-                            <div class="col-lg-12">
-                                <label for="TeamGroupId" class="h5">Nhóm</label>
-                                <div class="dropdown bootstrap-select form-control">
-                                    <select id="TeamGroupId" name="TeamGroupId" class="form-control" data-style="py-0">
-                                        @{
-                                            <option value="" selected>-- Chọn nhóm --</option>
-                                            foreach(var teamg in lstteamGroup)
-                                            {
-                                                <option value="@teamg.Id">@teamg.Name</option>
-                                            }
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="col-lg-12" hidden="true">
-                                <label for="TeamGroupId" class="h5">Nhóm</label>
-                                <div class="dropdown bootstrap-select form-control">
-                                    <select id="TeamGroupId" name="TeamGroupId" class="form-control" data-style="py-0">
-                                            <option value="" selected>-- Chọn nhóm --</option>                                      
-                                    </select>
-                                </div>
-                            </div>
-                        }           
-                        <div class="col-lg-12">
-                            <div class="d-flex flex-wrap align-items-ceter justify-content-center mt-2">
-                                <button type="submit" class="btn btn-primary mr-3"><i class="fas fa-save"></i>Lưu</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i>Đóng</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-        
-        </div>
-        </form>
-    </div>
+						<div class="col-lg-12">
+							<div class="form-group mb-3">
+								<label for="Description" class="h5">Mô tả</label>
+								<textarea class="form-control" id="Description" name="Description" rows="3"></textarea>
+							</div>
+						</div>
+						@if (currentUser != null && (currentUser.Role == (int)CommonEnums.Role.Leader || currentUser.Role == (int)CommonEnums.Role.Admin))
+						{
+							<div class="col-lg-12">
+								<label for="TeamGroupId" class="h5">Nhóm</label>
+								<div class="dropdown bootstrap-select form-control">
+									<select id="TeamGroupId" name="TeamGroupId" class="form-control" data-style="py-0">
+										@{
+											<option value="" selected>-- Chọn nhóm --</option>
+											foreach (var teamg in lstteamGroup)
+											{
+												<option value="@teamg.Id">@teamg.Name</option>
+											}
+										}
+									</select>
+								</div>
+							</div>
+						}
+						else
+						{
+							<div class="col-lg-12" hidden="true">
+								<label for="TeamGroupId" class="h5">Nhóm</label>
+								<div class="dropdown bootstrap-select form-control">
+									<select id="TeamGroupId" name="TeamGroupId" class="form-control" data-style="py-0">
+										<option value="" selected>-- Chọn nhóm --</option>
+									</select>
+								</div>
+							</div>
+						}
+						<div class="col-lg-12">
+							<div class="d-flex flex-wrap align-items-ceter justify-content-center mt-2">
+								<button type="submit" class="btn btn-primary mr-3"><i class="fas fa-save"></i>Lưu</button>
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i>Đóng</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</form>
+	</div>
 </div>
 
 
@@ -178,13 +177,14 @@
 
                 const id = $('#ProjectId').val();
                 const isEdit = id && parseInt(id) > 0;
+                let currentView = $('.list-grid-toggle > div.active').data('target-extra');
 
                 const data = {
                     Id: id,
                     Name: $('#Name').val(),
                     Description: $('#Description').val(),
-                    TeamGroupId : $('#TeamGroupId').val(),
-                    OwnerId : $('#OwnerId').val()
+                    TeamGroupId: $('#TeamGroupId').val(),
+                    OwnerId: $('#OwnerId').val()
                 };
 
                 $.ajax({
@@ -193,107 +193,22 @@
                     data: data,
                     success: function (response) {
                         if (response.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: isEdit ? 'Cập nhật thành công!' : 'Tạo dự án thành công!',
-                                text: 'Trang sẽ tự làm mới...',
-                                timer: 1500,
-                                showConfirmButton: false
-                            }).then(() => {
-                                location.reload();
+                            const mess = isEdit ? 'Cập nhật thành công!' : 'Tạo dự án thành công!';
+                            showAlert(mess, 'success');
+                            $('#new-project-modal').modal('hide');
+                            $('#project-container').load('/Project/FilterProject', function () {
+                                restoreProjectView(currentView);
                             });
                         } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Lỗi',
-                                text: response.error || 'Không thể xử lý yêu cầu.'
-                            });
+                            showAlert(response.error || 'Không thể xử lý yêu cầu.', 'error');
                         }
                     },
                     error: function () {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Lỗi server',
-                            text: 'Vui lòng thử lại sau.'
-                        });
+                        showAlert('Lỗi server', 'error');
                     }
                 });
             });
-        });
 
-        function openEditModal(id) {
-            $.ajax({
-                url: '/Project/GetProjectById?id=' + id,
-                type: 'GET',
-                success: function (res) {
-                    if (res.success) {
-                        const project = res.data;
-                        $('#ProjectId').val(project.Id);
-                        $('#OwnerId').val(project.OwnerId);
-                        $('#Name').val(project.Name);
-                        $('#Description').val(project.Description);
-                        $('#TeamGroupId').val(project.TeamGroupId).selectpicker('refresh');
-                        $('#projectModalLabel').text('✏️ Chỉnh sửa Dự án');
-                        $('#new-project-modal').modal('show');
-                    } else {
-                        Swal.fire('Lỗi', res.error || 'Không thể lấy dữ liệu.', 'error');
-                    }
-                },
-                error: function () {
-                    Swal.fire('Lỗi', 'Không thể kết nối đến máy chủ.', 'error');
-                }
-            });
-        }
-
-
-        function openAddModal() {
-            $('#ProjectId').val('');
-            $('#OwnerId').val('');
-            $('#Name').val('');
-            $('#Description').val('');
-            $('#projectModalLabel').text('➕ Thêm Dự án');
-            $('#TeamGroupId').val('').selectpicker('refresh');
-            $('#new-project-modal').modal('show');
-        }
-        function confirmDelete(projectId) {
-            Swal.fire({
-                title: 'Bạn có chắc muốn xóa?',
-                text: "Hành động này không thể hoàn tác!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Xóa',
-                cancelButtonText: 'Hủy'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/Project/DeleteProject',
-                        type: 'POST',
-                        data: { id: projectId },
-                        success: function (res) {
-                            if (res.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Đã xóa dự án!',
-                                    timer: 1000,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire('Lỗi', res.error || 'Không thể xóa.', 'error');
-                            }
-                        },
-                        error: function () {
-                            Swal.fire('Lỗi', 'Không thể kết nối server.', 'error');
-                        }
-                    });
-                }
-            });
-        }
-
-     $(document).ready(function () {
             $('[id^="assignedName-"]').each(function () {
                 const element = $(this);
                 const projectId = element.attr('id').split('-')[1];
@@ -314,56 +229,124 @@
                     }
                 });
             });
-        });
 
-     $(document).ready(function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('popup') === 'add') {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('popup') === 'add') {
                 openAddModal();
-       }
-     });
+            }
 
-     $(document).on('click', '#btnClearSearch', function () {
-            $('#searchtext').val('');
-            $('#searchtext2').val('');
-               doFilterTasks()
+            $('#Search').on('submit', function (e) {
+                e.preventDefault();
+                doFilterTasks();
+            });
+
+            $('#SearchMobile').on('submit', function (e) {
+                e.preventDefault();
+                doFilterTasks();
+            });
+
+            $(document).on('click', '#btnClearSearch', function () {
+                $('#searchtext').val('');
+                $('#searchtext2').val('');
+                doFilterTasks();
+            });
         });
 
-     function doFilterTasks() {
-          const text = $('#searchtext').val().trim();
-          const text2 = $('#searchtext2').val().trim();
+        function restoreProjectView(currentView) {
+            $('.list-grid-toggle > div').removeClass('active');
+            $('.list-grid-toggle > div[data-target-extra="' + currentView + '"]').addClass('active');
+            $('[data-toggle-extra="tab-content"]').removeClass('active');
+            $(currentView).addClass('active');
+        }
 
-          let ptextsearch = '';
-               if (window.innerWidth <= 576) {
-                   ptextsearch = text2;
-               } else {
-                   ptextsearch = text;
-               }
+        function openEditModal(id) {
+            $.ajax({
+                url: '/Project/GetProjectById?id=' + id,
+                type: 'GET',
+                success: function (res) {
+                    if (res.success) {
+                        const project = res.data;
+                        $('#ProjectId').val(project.Id);
+                        $('#OwnerId').val(project.OwnerId);
+                        $('#Name').val(project.Name);
+                        $('#Description').val(project.Description);
+                        $('#TeamGroupId').val(project.TeamGroupId).selectpicker('refresh');
+                        $('#projectModalLabel').text('✏️ Chỉnh sửa Dự án');
+                        $('#new-project-modal').modal('show');
+                    } else {
+                        showAlert(res.error || 'Không thể lấy dữ liệu.', 'error');
+                    }
+                },
+                error: function () {
+                    showAlert('Không thể kết nối đến máy chủ.', 'error');
+                }
+            });
+        }
 
-               $.ajax({
-                   url: '/Project/FilterProject',
-                   type: 'GET',
-                   data: {
-                      textsearch: ptextsearch
-                   },
-                   success: function (html) {
-                       $('#project-container').html(html);
-                   },
-                   error: function () {
-                       showAlert('Lỗi khi lọc dự án', 'error');
-                   }
-               });
-     }
-            $(document).ready(function () {
-               $('#Search').on('submit', function (e) {
-                   e.preventDefault();
-                   doFilterTasks();
-               });
-               $('#SearchMobile').on('submit', function (e) {
-                   e.preventDefault();
-                   doFilterTasks();
-               });
-                       
-           });
-	</script>
+        function openAddModal() {
+            $('#ProjectId').val('');
+            $('#OwnerId').val('');
+            $('#Name').val('');
+            $('#Description').val('');
+            $('#projectModalLabel').text('➕ Thêm Dự án');
+            $('#TeamGroupId').val('').selectpicker('refresh');
+            $('#new-project-modal').modal('show');
+        }
+
+        function confirmDelete(projectId) {
+            let currentView = $('.list-grid-toggle > div.active').data('target-extra');
+            Swal.fire({
+                title: 'Bạn có chắc muốn xóa?',
+                text: "Hành động này không thể hoàn tác!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Project/DeleteProject',
+                        type: 'POST',
+                        data: { id: projectId },
+                        success: function (res) {
+                            if (res.success) {
+                                showAlert('Đã xóa dự án!', 'success');
+                                $('#project-container').load('/Project/FilterProject', function () {
+                                    restoreProjectView(currentView);
+                                });
+                            } else {
+                                showAlert(res.error || 'Không thể xóa.', 'error');
+                            }
+                        },
+                        error: function () {
+                            showAlert('Không thể kết nối server.', 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        function doFilterTasks() {
+            const text = $('#searchtext').val().trim();
+            const text2 = $('#searchtext2').val().trim();
+            let currentView = $('.list-grid-toggle > div.active').data('target-extra');
+            let ptextsearch = window.innerWidth <= 576 ? text2 : text;
+
+            $.ajax({
+                url: '/Project/FilterProject',
+                type: 'GET',
+                data: { textsearch: ptextsearch },
+                success: function (html) {
+                    $('#project-container').html(html);
+                    restoreProjectView(currentView);
+                },
+                error: function () {
+                    showAlert('Lỗi khi lọc dự án', 'error');
+                }
+            });
+        }
+    </script>
+
 }

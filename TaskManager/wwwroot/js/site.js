@@ -13,42 +13,59 @@ $(document).ajaxStart(function () {
 $(document).ajaxStop(function () {
     hideLoader();
 });
-
-
-function showAlert(message, type = 'success', delay = 5000) {
-    const icons = {
-        success: 'bi bi-check-circle',
-        info: 'bi bi-info-circle',
-        warning: 'bi bi-exclamation-triangle',
-        error: 'bi bi-x-circle'
-    };
-
-    const colors = {
-        success: 'green',
-        info: 'blue',
-        warning: 'orange',
-        error: 'red'
-    };
-
-    const iconClass = icons[type] || icons['success'];
-    const colorClass = colors[type] || colors['success'];
-
-    const alert = `
-        <div class="alert alert-${type} alert-dismissible fade show d-flex align-items-center" role="alert" style="border-left: 5px solid ${colorClass};">
-            <i class="${iconClass} fs-4 me-2"></i>
-            <div class="alert-message">
-                <strong>${type === 'success' ? 'Thành công!' : type === 'info' ? 'Thông tin' : type === 'warning' ? 'Cảnh báo' : 'Lỗi'}</strong> 
-                <div>${message}</div>
-            </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    `;
-
-    $('#alert-container').append(alert);
-
-    setTimeout(() => {
-        $('#alert-container .alert').fadeOut('slow', function () {
-            $(this).remove();
-        });
-    }, delay);
+function ShowPoppupChangePassword() {
+    $('#changePasswordModal').modal('show');
 }
+
+$('#changePasswordForm').on('submit', function (e) {
+    e.preventDefault();
+    const currentPassword = $('#currentPassword').val().trim();
+    const newPassword = $('#newPassword').val().trim();
+    const confirmNewPassword = $('#confirmNewPassword').val().trim();
+
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+        showAlert('Vui lòng điền đầy đủ thông tin.', 'error');
+        return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+        showAlert('Mật khẩu mới không khớp.', 'error');
+        return;
+    }
+
+    $.ajax({
+        url: '/User/ChangePassword',
+        type: 'POST',
+        data: {
+            currentPassword,
+            newPassword
+        },
+        success: function (res) {
+            if (res.success) {
+                showAlert('Đổi mật khẩu thành công.', 'success');
+                $('#changePasswordModal').modal('hide');
+                $('#changePasswordForm')[0].reset();
+            } else {
+                showAlert(res.error || 'Không thể đổi mật khẩu.', 'error');
+            }
+        },
+        error: function () {
+            showAlert('Lỗi máy chủ.', 'error');
+        }
+    });
+});
+
+function showAlert(message, type = 'success', delay = 3000) {
+    const swalOptions = {
+        icon: type,
+        title: type === 'success' ? 'Thành công' : type === 'info' ? 'Thông tin' : type === 'warning' ? 'Cảnh báo' : 'Lỗi',
+        text: message,
+        timer: delay,
+        showConfirmButton: false,
+        toast: true,
+        position: 'bottom-end' 
+    };
+
+    Swal.fire(swalOptions);
+}
+

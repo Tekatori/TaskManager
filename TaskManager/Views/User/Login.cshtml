@@ -31,7 +31,7 @@
                             <a href="#" class="text-decoration-none small">Quên mật khẩu?</a>
                         </div>
 
-                        <div class="d-grid">
+                        <div class="d-flex justify-content-center">
                             <button type="submit" class="btn btn-primary">Đăng nhập</button>
                         </div>
                     </form>
@@ -44,6 +44,7 @@
         </div>
     </div>
 </div>
+
 
 
 @section Scripts{
@@ -62,30 +63,17 @@
                     type: 'POST',
                     data: data,
                     success: function (response) {
-                        if (response.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Đăng nhập thành công',
-                                text: 'Chuyển hướng trong giây lát...',
-                                timer: 1500,
-                                showConfirmButton: false
-                            }).then(() => {
+                        if (response.success) {                        
+                            showAlert('Đăng nhập thành công', 'success');
+                            setTimeout(function () {
                                 window.location.href = response.redirectUrl;
-                            });
+                            }, 800);
                         } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Lỗi',
-                                text: response.error || 'Đăng nhập thất bại'
-                            });
+                            showAlert(response.error || 'Đăng nhập thất bại', 'error');
                         }
                     },
                     error: function () {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Lỗi kết nối',
-                            text: 'Không thể gửi yêu cầu đến server.'
-                        });
+                         showAlert('Không thể gửi yêu cầu đến server', 'error');
                     }
                 });
             });

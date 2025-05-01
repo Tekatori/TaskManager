@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using TaskManager.BLL;
 using TaskManager.Models;
 using TaskManager.DAL.ViewModel;
+using Microsoft.EntityFrameworkCore;
 namespace TaskManager.Controllers
 {
     public class UserController : Controller
@@ -125,8 +126,16 @@ namespace TaskManager.Controllers
             return RedirectToAction("Login", "User");
         }
 
+        #region TeamGroup
         public IActionResult TeamGroup()
         {
+            var currentUser = CookieHelper.GetLoggedUser(User);
+            if (currentUser == null)
+                return RedirectToAction("Login", "User");
+            if(currentUser.Role == (int)CommonEnums.Role.User)
+                return RedirectToAction("Index", "Home");
+
+
             var lstTeamGroup = _userService.GetALLTeamGroup();
 
             var viewmodel = ExtensionClass.ConvertList<TeamGroup, TeamGroupViewModel>(lstTeamGroup);
@@ -143,9 +152,27 @@ namespace TaskManager.Controllers
                     item.ListIdUserInt = ExtensionClass.ToIntList(item.ListIdUser);
                 }
             }
-            var lstUser = _userService.GetAllUser();
-            ViewBag.lstUser = lstUser;
             return View(viewmodel);
+        }
+        public IActionResult GetListTeamGroup()
+        {
+            var lstTeamGroup = _userService.GetALLTeamGroup();
+
+            var viewmodel = ExtensionClass.ConvertList<TeamGroup, TeamGroupViewModel>(lstTeamGroup);
+
+            if (viewmodel != null && viewmodel.Count > 0)
+            {
+                foreach (var item in viewmodel)
+                {
+                    var user = _userService.GetUser(item.CreatedBy ?? 0);
+                    if (user != null)
+                    {
+                        item.CreatedByName = user.Username;
+                    }
+                    item.ListIdUserInt = ExtensionClass.ToIntList(item.ListIdUser);
+                }
+            }
+            return PartialView("_ListTeamGroup", viewmodel);
         }
         [HttpPost]
         public IActionResult CreateTeamGroup(TeamGroup teamGroup)
@@ -205,7 +232,6 @@ namespace TaskManager.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
-
         public ActionResult GetUsersNotForTeam(int teamId)
         {
             try
@@ -230,6 +256,95 @@ namespace TaskManager.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+        #endregion
+
+        #region Admin
+        public IActionResult RoleUser()
+        {
+            var currentUser = CookieHelper.GetLoggedUser(User);
+            if (currentUser == null)
+                return RedirectToAction("Login", "User");
+            if (currentUser.Role != (int)CommonEnums.Role.Admin)
+                return RedirectToAction("Index", "Home");
+
+            var models = _userService.GetAllUser();
+            return View(models);
+        }
+        public IActionResult _RoleUser(RoleUserParam param)
+        {
+            var currentUser = CookieHelper.GetLoggedUser(User);
+            if (currentUser == null)
+                return RedirectToAction("Login", "User");
+            if (currentUser.Role != (int)CommonEnums.Role.Admin)
+                return RedirectToAction("Index", "Home");
+
+            var models = _userService.GetAllUser();
+
+            if (!string.IsNullOrWhiteSpace(param.searchText))
+            {
+                string keyword = param.searchText.Trim().ToLower();
+                models = models
+                    .Where(t =>
+                        (!string.IsNullOrEmpty(t.Username) && t.Username.ToLower().Contains(keyword)) ||
+                        (!string.IsNullOrEmpty(t.Email) && t.Email.ToLower().Contains(keyword)))
+                    .ToList();
+            }
+
+            return PartialView("_ListRoleUser", models);
+        }
+        [HttpPost]
+        public IActionResult UpdateRole(int? Id, int? Role)
+        {
+            if(!Id.HasValue || !Role.HasValue)
+                return Json(new { success = false });
+
+            var currentUser = CookieHelper.GetLoggedUser(User);
+            if (currentUser == null)
+                return RedirectToAction("Login", "User");
+            if (currentUser.Role != (int)CommonEnums.Role.Admin)
+                return Json(new { success = false, message = "Bạn không có quyền cập nhật" });
+
+            var res = _userService.UpdateRoleUser(Id,Role);
+
+            if (res > 0 )
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false });
+        }
+        [HttpPost]
+        public JsonResult ChangePassword(string currentPassword, string newPassword)
+        {
+            var currentUser = CookieHelper.GetLoggedUser(User);
+            if (currentUser == null || !currentUser.Id.HasValue || currentUser.Id == 0)
+                return Json(new { success = false, error = "Chưa đăng nhập" });
+            if(string.IsNullOrEmpty(currentPassword) || string.IsNullOrEmpty(newPassword))
+            {
+                return Json(new { success = false, error = "Vui lòng nhập đầy đủ mật khẩu hiện tại và mật khẩu mới." });
+            }    
+
+            var us = _userService.GetUser(currentUser.Id.Value);
+
+            if (us == null)
+            {
+                return Json(new { success = false, error = "Người dùng không hợp lệ" });
+            }
+
+            if (VerifyPassword(currentPassword, us.PasswordHash) == false)
+            {
+                return Json(new { success = false, error = "Mật khẩu hiện tại không chính xác." });
+            }
+
+            string passwordnewhash = HashPassword(newPassword);
+            var result = _userService.ChangePassWord(currentUser.Id,passwordnewhash);
+            if (result > 0)
+                return Json(new { success = true });
+
+            return Json(new { success = false, error = "Thay đổi mật khẩu thất bại" });
+        }
+
+        #endregion
+
         #region Private
         private bool IsTextNull(string text)
         {

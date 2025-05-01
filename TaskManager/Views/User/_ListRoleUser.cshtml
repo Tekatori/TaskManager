@@ -1,0 +1,123 @@
+﻿@using TaskManager.Models;
+@model List<User>
+
+
+<div id="grid" class="item-content animate__animated animate__fadeIn active" data-toggle-extra="tab-content">
+    <div class="row">
+        @if (!Model.Any())
+        {
+            <div class="col-lg-12 col-md-12">
+                <H3 class="text-center text-muted"><i class="ri-information-line mr-2"></i> Không tìm thấy người dùng</H3>
+            </div>
+        }
+        else
+        {
+            @foreach (var team in Model)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="card-transparent card-block card-stretch card-height">
+                        <div class="card-body text-center p-0">
+                            <div class="item">
+                                <div class="odr-img">
+                                    <img src="/img/11539820.png" class="img-fluid rounded-circle avatar-90 m-auto" alt="image">
+                                </div>
+                                <div class="odr-content rounded">
+                                    <h4 class="mb-2">@team.Username</h4>
+                                    <p class="mb-3">Email: @team.Email</p>
+                                    <ul class="list-unstyled mb-3">
+                                        @{
+                                            var GetNameRole = team.Role switch
+                                            {
+                                                (int)CommonEnums.Role.Admin => CommonEnums.GetDescription(CommonEnums.Role.Admin),
+                                                (int)CommonEnums.Role.User => CommonEnums.GetDescription(CommonEnums.Role.User),
+                                                (int)CommonEnums.Role.Leader => CommonEnums.GetDescription(CommonEnums.Role.Leader),
+                                                _ => "Người dùng"
+                                            };
+                                            var iconClass = team.Role switch
+                                            {
+                                                (int)CommonEnums.Role.Admin => "ri-admin-fill",
+                                                (int)CommonEnums.Role.User => "ri-user-fill",
+                                                (int)CommonEnums.Role.Leader => "ri-team-fill",
+                                                _ => "ri-user-fill"
+                                            };
+                                        }
+                                        <li class="role-item">
+                                            <button class="btn btn-link p-0" onclick="openPopupEdit(@team.Id, @team.Role)">
+                                                <i class="@iconClass mr-2"></i>@GetNameRole
+                                                <i class="bi bi-pencil-square ml-2"></i>
+                                            </button>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+    </div>
+</div>
+<div id="list" class="item-content animate__animated animate__fadeIn" data-toggle-extra="tab-content">
+    <div class="table-responsive rounded bg-white mb-4">
+        <table class="table mb-0 table-borderless tbl-server-info">
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            <H3 class="text-center text-muted"><i class="ri-information-line mr-2"></i> Không tìm thấy người dùng</H3>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var team in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="media align-items-center">
+                                    <img src="/img/11539820.png" class="img-fluid rounded-circle avatar-40" alt="image">
+                                    <h5 class="ml-3">@team.Username</h5>
+                                </div>
+                            </td>
+                            <td>Email: @team.Email</td>
+                            <td>
+                                <div class="media align-items-center">
+
+                                    @{
+                                        var GetNameRole = team.Role switch
+                                        {
+                                            (int)CommonEnums.Role.Admin => CommonEnums.GetDescription(CommonEnums.Role.Admin),
+                                            (int)CommonEnums.Role.User => CommonEnums.GetDescription(CommonEnums.Role.User),
+                                            (int)CommonEnums.Role.Leader => CommonEnums.GetDescription(CommonEnums.Role.Leader),
+                                            _ => "Người dùng"
+                                        };
+                                        var iconClass = team.Role switch
+                                        {
+                                            (int)CommonEnums.Role.Admin => "ri-admin-fill",
+                                            (int)CommonEnums.Role.User => "ri-user-fill",
+                                            (int)CommonEnums.Role.Leader => "ri-team-fill",
+                                            _ => "ri-user-fill"
+                                        };
+                                    }
+                                    <p class="role-item" data-id="@team.Id" data-role="@team.Role">
+                                        <button class="btn btn-link p-0" onclick="openPopupEdit(@team.Id, @team.Role)">
+                                            <i class="@iconClass mr-2"></i>@GetNameRole
+                                            <i class="bi bi-pencil-square ml-2"></i>
+                                        </button>
+                                    </p>
+
+
+                                </div>
+                            </td>
+
+
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

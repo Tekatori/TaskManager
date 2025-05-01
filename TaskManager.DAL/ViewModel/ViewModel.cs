@@ -79,5 +79,8 @@ namespace TaskManager.DAL.ViewModel
         public int year { get; set; } = 0;
         public int? IdProject { get; set; }
     }
-
+    public class RoleUserParam
+    {
+        public string searchText { get; set; }
+    }
 }
