@@ -10,6 +10,8 @@ using TaskManager.Models;
 using TaskManager.DAL.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Principal;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authentication.Google;
 namespace TaskManager.Controllers
 {
     public class UserController : Controller
@@ -193,6 +195,108 @@ namespace TaskManager.Controllers
             }
             return Json(new { success = true});
         }
+
+        #region Login Google
+        public IActionResult GoogleLogin()
+        {
+            var properties = new AuthenticationProperties
+            {
+                RedirectUri = Url.Action("GoogleCallback")
+            };
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+        public async Task<IActionResult> GoogleCallback()
+        {
+            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            if (result.Succeeded)
+            {
+                var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
+
+                if (!string.IsNullOrEmpty(email))
+                {
+
+                    var finduser = _userService.GetUserByEmail(email);
+
+                    if (finduser != null && finduser.Id > 0)
+                    {
+
+                        var claims = new List<Claim>
+                            {
+                                new Claim(ClaimTypes.NameIdentifier, finduser.Id.ToString()),
+                                new Claim(ClaimTypes.Name, finduser.Username),
+                                new Claim(ClaimTypes.Email, finduser.Email ?? ""),
+                                new Claim(ClaimTypes.Role, finduser.Role?.ToString() ?? "0")
+                            };
+
+                        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var principal = new ClaimsPrincipal(identity);
+
+                        var authProperties = new AuthenticationProperties
+                        {
+                            IsPersistent = true,
+                            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(2)
+                        };
+
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
+
+
+                        HttpContext.Session.SetString("username", finduser.Username);
+
+
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+
+                        var newUser = new Users
+                        {
+                            Email = email,
+                            Username = email,  
+                            Role = (int)CommonEnums.Role.User,  
+                            CreatedAt = DateTime.Now,
+                            PasswordHash = HashPassword(Guid.NewGuid().ToString())  
+                        };
+
+
+                        var res = _userService.CreateUser(newUser);
+
+                        if (res > 0)  
+                        {
+                            var claims = new List<Claim>
+                                {
+                                    new Claim(ClaimTypes.NameIdentifier, newUser.Id.ToString()),
+                                    new Claim(ClaimTypes.Name, newUser.Username),
+                                    new Claim(ClaimTypes.Email, newUser.Email ?? ""),
+                                    new Claim(ClaimTypes.Role, newUser.Role?.ToString() ?? "0")
+                                };
+
+                            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                            var principal = new ClaimsPrincipal(identity);
+
+                            var authProperties = new AuthenticationProperties
+                            {
+                                IsPersistent = true,
+                                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(2)
+                            };
+
+                            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
+
+                            HttpContext.Session.SetString("username", newUser.Username);
+
+                            return RedirectToAction("Index", "Home");
+                        }
+                        else
+                        {
+                            return RedirectToAction("Login", "User");
+                        }
+                    }
+                }
+            }
+            return RedirectToAction("Login", "User");
+        }
+
+        #endregion
 
         #region TeamGroup
         public IActionResult TeamGroup()
