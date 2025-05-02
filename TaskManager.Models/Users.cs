@@ -7,7 +7,7 @@ using System.Xml.Linq;
 
 namespace TaskManager.Models
 {
-    public class User
+    public class Users
     {
         public int Id { get; set; }
         public string Username { get; set; } = string.Empty;
@@ -15,5 +15,8 @@ namespace TaskManager.Models
         public string PasswordHash { get; set; } = string.Empty;
         public int? Role { get; set; } = 0;
         public DateTime? CreatedAt { get; set; }
+
+        public string? ResetToken { get; set; } = string.Empty;
+        public DateTime? ResetTokenExpires { get; set; }
     }
 }

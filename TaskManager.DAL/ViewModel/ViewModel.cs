@@ -83,4 +83,13 @@ namespace TaskManager.DAL.ViewModel
     {
         public string searchText { get; set; }
     }
+    public class ResetPasswordViewModel
+    {
+        public string Token { get; set; }
+        public string UserName { get; set; }
+        public string NewPassword { get; set; }
+        public string ConfirmPassword { get; set; }
+
+        public string NewPasswordHash { get; set; }
+    }
 }

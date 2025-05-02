@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.DAL;
+using TaskManager.DAL.ViewModel;
 using TaskManager.Models;
 
 namespace TaskManager.BLL
@@ -20,19 +22,19 @@ namespace TaskManager.BLL
         }
 
         #region GET Item
-        public List<User> GetAllUser()
+        public List<Users> GetAllUser()
         {
             return _repo.GetAllUser();
         }
-        public User GetUser(int pId)
+        public Users GetUser(int pId)
         {
            return _repo.GetUser(pId);
         }
-        public User GetUser(string pUserName)
+        public Users GetUser(string pUserName)
         {
            return _repo.GetUser(pUserName);
         }
-        public User GetUserByEmail(string pEmail)
+        public Users GetUserByEmail(string pEmail)
         {
             return _repo.GetUserByEmail(pEmail);
         }
@@ -48,6 +50,11 @@ namespace TaskManager.BLL
         {
             return _repo.GetALLTeamGroup();
         }
+
+        public List<TeamGroup> GetAllTeamGroupByAccount(int? pIdUser)
+        {
+            return _repo.GetAllTeamGroupByAccount(pIdUser);
+        }
         public TeamGroup GetTeamGroup(int pId)
         {
             return _repo.GetTeamGroup(pId);
@@ -56,26 +63,38 @@ namespace TaskManager.BLL
         {
             return _repo.isExitTeamGroup(pName);
         }
-        public List<User> GetUserByTeamGroupId(int pTeamGroupId)
+        public List<Users> GetUserByTeamGroupId(int pTeamGroupId)
         {
             return _repo.GetUserByTeamGroupId(pTeamGroupId);
         }
-        public List<User> GetUsersExcludingTeamGroupId(int pTeamGroupId)
+        public List<Users> GetUsersExcludingTeamGroupId(int pTeamGroupId)
         {
             return _repo.GetUsersExcludingTeamGroupId(pTeamGroupId);
+        }
+        public Users ForgotPasswordAccount(UserViewModel account)
+        {
+            return _repo.ForgotPasswordAccount(account);
+        }
+        public Users ExpTokenResetPasswordAccount(UserViewModel account)
+        {
+            return _repo.ExpTokenResetPasswordAccount(account);
+        }
+        public int ResetPasswordAccount(ResetPasswordViewModel model)
+        {
+            return _repo.ResetPasswordAccount(model);
         }
         #endregion
 
         #region CRUD
-        public int CreateUser(User pUser)
+        public int CreateUser(Users pUser)
         {
             return _repo.CreateUser(pUser);
         }
-        public int UpdateUser(User pUser)
+        public int UpdateUser(Users pUser)
         {
             return _repo.UpdateUser(pUser);
         }
-        public int DeleteUser(User pUser)
+        public int DeleteUser(Users pUser)
         {
             return _repo.DeleteUser(pUser);
         }

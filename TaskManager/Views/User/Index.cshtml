@@ -1,44 +1,95 @@
 ﻿@{
-    Layout = "_Layout";
+    //Layout = "_Layout";
     ViewData["Title"] = "Giới thiệu";
     var username = Context.Session.GetString("username")
            ?? User.Identity?.Name;
 }
 
-<div class="container">
-    <div class="row align-items-center">
-        <div class="col-md-6">
-            <h1 class="display-5 fw-bold">Quản lý công việc hiệu quả hơn</h1>
-            <p class="lead">Task Manager giúp bạn theo dõi, phân công, và hoàn thành công việc dễ dàng. Giao diện đơn giản, hoạt động mượt mà, phù hợp cho cá nhân và nhóm.</p>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Giới thiệu | Task Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="display-5 fw-bold">Quản lý công việc hiệu quả hơn</h1>
+                <p class="lead">Task Manager giúp bạn theo dõi, phân công, và hoàn thành công việc dễ dàng. Giao diện đơn giản, hoạt động mượt mà, phù hợp cho cá nhân và nhóm.</p>
 
-            @if (!string.IsNullOrEmpty(username))
-            {
-                <a href="/Home/Index" class="btn btn-primary btn-lg">Bắt đầu ngay</a>
-            }
-            else
-            {
-                <a href="/User/Login" class="btn btn-primary btn-lg">Bắt đầu ngay</a>
-            }      
+                @if (!string.IsNullOrEmpty(username))
+                {
+                    <a href="/Home/Index" class="btn btn-primary btn-lg"><i class="ri-arrow-right-line me-1"></i>Bắt đầu ngay</a>
+                }
+                else
+                {
+                    <a href="/User/Login" class="btn btn-primary btn-lg"><i class="ri-login-box-line me-1"></i>Bắt đầu ngay</a>
+                }
+            </div>
+            <div class="col-md-6 text-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/2921/2921222.png" class="img-fluid" style="max-height: 300px;" />
+            </div>
         </div>
-        <div class="col-md-6 text-center">
-            <img src="https://cdn-icons-png.flaticon.com/512/2921/2921222.png" class="img-fluid" style="max-height: 300px;" />
+
+        <hr class="my-5" />
+
+        <div class="text-center mb-5">
+            <h3 class="fw-bold">🚀 Tính năng nổi bật</h3>
+            <p class="text-muted">Tối ưu công việc – tăng hiệu suất nhóm</p>
+        </div>
+
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <i class="ri-lightbulb-flash-line display-6 text-primary mb-2"></i>
+                <h5>Giao diện thông minh</h5>
+                <p>Dễ sử dụng, phù hợp mọi trình độ người dùng.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <i class="ri-line-chart-line display-6 text-success mb-2"></i>
+                <h5>Theo dõi tiến độ</h5>
+                <p>Quan sát công việc theo thời gian thực.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <i class="ri-group-line display-6 text-warning mb-2"></i>
+                <h5>Làm việc nhóm</h5>
+                <p>Phân công & kiểm soát hiệu quả nhóm làm việc.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <i class="ri-timer-line display-6 text-danger mb-2"></i>
+                <h5>Nhắc nhở deadline</h5>
+                <p>Thông báo khi nhiệm vụ gần hết hạn.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <i class="ri-file-paper-2-line display-6 text-info mb-2"></i>
+                <h5>Gắn file & bình luận</h5>
+                <p>Trao đổi, cập nhật tiến độ nhanh chóng.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <i class="ri-dashboard-line display-6 text-secondary mb-2"></i>
+                <h5>Dashboard trực quan</h5>
+                <p>Thống kê dễ hiểu, nắm bắt toàn cục dễ dàng.</p>
+            </div>
+        </div>
+
+        <div class="my-5 text-center">
+            <blockquote class="blockquote">
+                <p class="mb-3 fst-italic">“Task Manager giúp team mình tiết kiệm 30% thời gian họp mỗi tuần!”</p>
+                <footer class="blockquote-footer mt-2">Một nhóm người dùng thử nghiệm</footer>
+            </blockquote>
+        </div>
+
+        <div class="text-center mt-5">
+            <p class="text-muted small">Dự án cá nhân của Trần Hữu Danh – xây dựng bằng ASP.NET Core MVC & Clean Architecture.</p>
+            <p><a href="https://github.com/your-github/task-manager" target="_blank" class="text-decoration-none"><i class="ri-github-fill"></i> Xem mã nguồn trên GitHub</a></p>
         </div>
     </div>
 
-    <hr class="my-5" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 
-    <div class="row text-center">
-        <div class="col-md-4">
-            <h4>🧠 Giao diện thông minh</h4>
-            <p>Dễ sử dụng, phù hợp mọi trình độ.</p>
-        </div>
-        <div class="col-md-4">
-            <h4>⚡ Theo dõi tiến độ</h4>
-            <p>Xem trạng thái từng công việc theo thời gian thực.</p>
-        </div>
-        <div class="col-md-4">
-            <h4>👥 Làm việc nhóm</h4>
-            <p>Giao việc và quản lý hiệu suất nhóm hiệu quả.</p>
-        </div>
-    </div>
-</div>
+

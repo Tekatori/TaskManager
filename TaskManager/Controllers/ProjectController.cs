@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TaskManager.BLL;
+using TaskManager.DAL.ViewModel;
 using TaskManager.Models;
 
 namespace TaskManager.Controllers
@@ -25,7 +26,7 @@ namespace TaskManager.Controllers
 
             if(currentUser.Role ==(int)CommonEnums.Role.Admin || currentUser.Role == (int)CommonEnums.Role.Leader)
             {
-                var lstteamGroup = _userService.GetALLTeamGroup();
+                var lstteamGroup = _userService.GetAllTeamGroupByAccount(currentUser.Id);
                 ViewBag.lstteamGroup = lstteamGroup;
             }         
             return View(projects);
@@ -48,7 +49,7 @@ namespace TaskManager.Controllers
             }
             if (currentUser.Role == (int)CommonEnums.Role.Admin || currentUser.Role == (int)CommonEnums.Role.Leader)
             {
-                var lstteamGroup = _userService.GetALLTeamGroup();
+                var lstteamGroup = _userService.GetAllTeamGroupByAccount(currentUser.Id);
                 ViewBag.lstteamGroup = lstteamGroup;
             }
             return PartialView("_ProjectListPartial", projects);

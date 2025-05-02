@@ -7,12 +7,38 @@ function hideLoader() {
 }
 
 $(document).ajaxStart(function () {
-    showLoader();
+    showLoading();
 });
 
 $(document).ajaxStop(function () {
-    hideLoader();
+    hideLoading();
 });
+
+
+function showLoading() {
+    $("#loading").stop(true, true).fadeIn(150);
+}
+
+function hideLoading() {
+    $("#loading").stop(true, true).fadeOut(200);
+}
+
+$(document).ready(function () {
+    $('a').on('click', function (e) {
+        const href = $(this).attr('href');
+
+        if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+
+        e.preventDefault();
+        showLoading();
+
+        setTimeout(() => {
+            window.location.href = href;
+        }, 200);
+    });
+});
+
+
 function ShowPoppupChangePassword() {
     $('#changePasswordModal').modal('show');
 }

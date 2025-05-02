@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace TaskManager.Models
+namespace TaskManager.DAL.ViewModel
 {
     public static class CommonEnums
     {

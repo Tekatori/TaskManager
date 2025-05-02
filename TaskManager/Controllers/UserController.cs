@@ -9,6 +9,7 @@ using TaskManager.BLL;
 using TaskManager.Models;
 using TaskManager.DAL.ViewModel;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Principal;
 namespace TaskManager.Controllers
 {
     public class UserController : Controller
@@ -38,7 +39,7 @@ namespace TaskManager.Controllers
             if (IsTextNull(user.Password))
                 return Json(new { error = "Mật khẩu không được trống" });
 
-            User us = new User();
+            Users us = new Users();
             if(IsEmail(user.Username))
             {
                 user.Email = user.Username;
@@ -103,7 +104,7 @@ namespace TaskManager.Controllers
                 return Json(new { error = "Tên đăng nhập đã tồn tại" });
             if (_userService.isExitEmailUser(user.Email))
                 return Json(new { error = "Email đã tồn tại" });     
-            User us = new User();
+            Users us = new Users();
             us.Email = user.Email;
             us.Username = user.Username;
             us.Role = user.Role;
@@ -126,6 +127,73 @@ namespace TaskManager.Controllers
             return RedirectToAction("Login", "User");
         }
 
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult ForgotPassword(UserViewModel account)
+        {
+            var user = _userService.ForgotPasswordAccount(account);
+
+            if (user == null)
+            {
+                return Json(new { error = "Email không hợp lệ hoặc chưa được đăng ký!" });
+            }
+            string path = AppDomain.CurrentDomain.BaseDirectory;
+            var config = new ConfigurationBuilder()
+                .SetBasePath(path)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+            EmailService _emailService = new EmailService(config);
+            string resetLink = Url.Action("ResetPassword", "User", new { Token = user.ResetToken }, Request.Scheme);
+            string subject = "🔒 Đặt lại mật khẩu - Teka - Task Manager";
+            string htmlContent = _emailService.GetHtmlContentEmail(resetLink);
+
+            _emailService.SendEmail(user.Email, subject, htmlContent);
+
+            return Json(new { success = true, Message= "Hãy kiểm tra email để đặt lại mật khẩu." });
+        }
+        public IActionResult ConfirmMail(string Email)
+        {
+            ViewBag.Email = Email;
+            return View();
+        }
+        public ActionResult ResetPassword(UserViewModel account)
+        {
+
+            var user = _userService.ExpTokenResetPasswordAccount(account);
+            if (user == null)
+            {
+                ViewBag.TokenExpired = true;
+                return View(new ResetPasswordViewModel());
+            }
+            return View(new ResetPasswordViewModel { Token = account.Token,UserName = user.Username });
+        }
+        [HttpPost]
+        public ActionResult ResetPassword(ResetPasswordViewModel model)
+        {
+            if (string.IsNullOrEmpty(model.NewPassword))
+                return Json(new { error = "Vui lòng nhập mật khẩu mới." });
+
+            if (string.IsNullOrEmpty(model.ConfirmPassword))
+                return Json(new { error = "Vui lòng nhập lại mật khẩu để xác nhận." });
+
+            if (model.NewPassword != model.ConfirmPassword)
+                return Json(new { error = "Mật khẩu xác nhận không khớp." });
+
+
+            model.NewPasswordHash = HashPassword(model.NewPassword);
+
+            var res = _userService.ResetPasswordAccount(model);
+            if (res == 0)
+            {
+                return Json(new { error = "Liên kết đặt lại mật khẩu đã hết hạn. Vui lòng yêu cầu lại bằng cách nhấn 'Bạn quên mật khẩu?' để nhận liên kết mới." });
+            }
+            return Json(new { success = true});
+        }
+
         #region TeamGroup
         public IActionResult TeamGroup()
         {
@@ -136,7 +204,7 @@ namespace TaskManager.Controllers
                 return RedirectToAction("Index", "Home");
 
 
-            var lstTeamGroup = _userService.GetALLTeamGroup();
+            var lstTeamGroup = _userService.GetAllTeamGroupByAccount(currentUser.Id);
 
             var viewmodel = ExtensionClass.ConvertList<TeamGroup, TeamGroupViewModel>(lstTeamGroup);
 
@@ -156,7 +224,13 @@ namespace TaskManager.Controllers
         }
         public IActionResult GetListTeamGroup()
         {
-            var lstTeamGroup = _userService.GetALLTeamGroup();
+            var currentUser = CookieHelper.GetLoggedUser(User);
+            if (currentUser == null)
+                return RedirectToAction("Login", "User");
+            if (currentUser.Role == (int)CommonEnums.Role.User)
+                return RedirectToAction("Index", "Home");
+
+            var lstTeamGroup = _userService.GetAllTeamGroupByAccount(currentUser.Id);
 
             var viewmodel = ExtensionClass.ConvertList<TeamGroup, TeamGroupViewModel>(lstTeamGroup);
 

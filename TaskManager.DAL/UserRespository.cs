@@ -20,30 +20,30 @@ namespace TaskManager.DAL
         #endregion
 
         #region Public
-        public List<User> GetAllUser()
+        public List<Users> GetAllUser()
         {
             var us = _context.Users.ToList();
             if (us != null && us.Count() > 0)
                 return us;
-            return new List<User>();
+            return new List<Users>();
         }
-        public User GetUser(int pId)
+        public Users GetUser(int pId)
         {
             var user = _context.Users.FirstOrDefault(x => x.Id == pId);
             if (user != null) return user;
-            return new User();
+            return new Users();
         }
-        public User GetUser(string pUserName)
+        public Users GetUser(string pUserName)
         {
             var user = _context.Users.FirstOrDefault(x => x.Username == pUserName);
             if (user != null) return user;
-            return new User();
+            return new Users();
         }
-        public User GetUserByEmail(string pEmail)
+        public Users GetUserByEmail(string pEmail)
         {
             var user = _context.Users.FirstOrDefault(x => x.Email == pEmail);
             if (user != null) return user;
-            return new User();
+            return new Users();
         }
 
         public bool isExitEmailUser(string pEmail)
@@ -62,47 +62,54 @@ namespace TaskManager.DAL
                 isExit = true;
             return isExit;
         }
-        public int CreateUser(User pUser)
+        public int CreateUser(Users pUser)
         {
             pUser.Id = 0;
             return SaveData(pUser);
         }
-        public int UpdateUser(User pUser)
+        public int UpdateUser(Users pUser)
         {
             return SaveData(pUser);
         }
-        public int DeleteUser(User pUser)
+        public int DeleteUser(Users pUser)
         {
             return SaveData(pUser, true);
         }
-        public List<User> GetUserByTeamGroupId(int pTeamGroupId)
+        public List<Users> GetUserByTeamGroupId(int pTeamGroupId)
         {
             var teamGroup = _context.TeamGroup.FirstOrDefault(t => t.Id == pTeamGroupId);
             if (teamGroup == null || string.IsNullOrWhiteSpace(teamGroup.ListIdUser))
-                return new List<User>();
+                return new List<Users>();
 
             var lstIdUser = teamGroup.ListIdUser.ToIntList();
             if (lstIdUser.Count == 0)
-                return new List<User>();
+                return new List<Users>();
 
             return _context.Users.Where(x => lstIdUser.Contains(x.Id)).ToList();
         }
 
-        public List<User> GetUsersExcludingTeamGroupId(int pTeamGroupId)
+        public List<Users> GetUsersExcludingTeamGroupId(int pTeamGroupId)
         {
             var teamGroup = _context.TeamGroup.FirstOrDefault(t => t.Id == pTeamGroupId);
             if (teamGroup == null || string.IsNullOrWhiteSpace(teamGroup.ListIdUser))
-                return new List<User>();
+                return new List<Users>();
 
             var lstIdUser = teamGroup.ListIdUser.ToIntList();
             if (lstIdUser.Count == 0)
-                return new List<User>();
+                return new List<Users>();
 
             return _context.Users.Where(x => !lstIdUser.Contains(x.Id)).ToList();
         }
         public List<TeamGroup> GetALLTeamGroup()
         {
             var tg = _context.TeamGroup.ToList();
+            if (tg != null && tg.Count() > 0)
+                return tg;
+            return new List<TeamGroup>();
+        }
+        public List<TeamGroup> GetAllTeamGroupByAccount(int? pIdUser)
+        {
+            var tg = _context.TeamGroup.Where(t=>t.CreatedBy == pIdUser).ToList();
             if (tg != null && tg.Count() > 0)
                 return tg;
             return new List<TeamGroup>();
@@ -168,10 +175,57 @@ namespace TaskManager.DAL
             }
             return res;
         }
+
+        public Users ForgotPasswordAccount(UserViewModel account)
+        {
+            if (!string.IsNullOrEmpty(account.Email))
+            {
+                var us = _context.Users.FirstOrDefault(u => u.Email == account.Email);
+                if (us != null)
+                {
+                    string token = Guid.NewGuid().ToString();
+                    us.ResetToken = token;
+                    us.ResetTokenExpires = DateTime.Now.AddHours(1);
+                    _context.SaveChanges();
+                    return us;
+                }
+            }
+            return null;
+        }
+        public Users ExpTokenResetPasswordAccount(UserViewModel account)
+        {
+            if (!string.IsNullOrEmpty(account.Token))
+            {
+                var us = _context.Users.FirstOrDefault(u => u.ResetToken == account.Token && u.ResetTokenExpires > DateTime.Now);
+                if (us != null)
+                {
+                    return us;
+                }
+            }
+            return null;
+        }
+        public int ResetPasswordAccount(ResetPasswordViewModel model)
+        {
+            int res = 0;
+            if (!string.IsNullOrEmpty(model.Token))
+            {
+                var user = _context.Users.FirstOrDefault(u => u.ResetToken == model.Token && u.ResetTokenExpires > DateTime.Now);
+                if (user == null)
+                {
+                    return res;
+                }
+
+                user.PasswordHash = model.NewPasswordHash;
+                user.ResetToken = null;
+                user.ResetTokenExpires = null;
+                res = _context.SaveChanges();
+            }
+            return res;
+        }
         #endregion
 
         #region Private
-        private int SaveData(User pUser, bool pIsDelete = false)
+        private int SaveData(Users pUser, bool pIsDelete = false)
         {
             int res = 0;
             var user = _context.Users.FirstOrDefault(t => t.Id == pUser.Id);
