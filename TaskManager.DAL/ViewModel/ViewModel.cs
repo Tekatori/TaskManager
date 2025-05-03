@@ -82,6 +82,9 @@ namespace TaskManager.DAL.ViewModel
     public class RoleUserParam
     {
         public string searchText { get; set; }
+
+        public int PageIndex { get; set; } = 1;
+        public int PageSize { get; set; } = 5;
     }
     public class ResetPasswordViewModel
     {
@@ -92,4 +95,12 @@ namespace TaskManager.DAL.ViewModel
 
         public string NewPasswordHash { get; set; }
     }
+    public class PagedResult<T>
+    {
+        public List<T> Items { get; set; }
+        public int TotalItems { get; set; }
+        public int PageIndex { get; set; }
+        public int PageSize { get; set; }
+    }
+
 }

@@ -1,5 +1,5 @@
 ﻿@using TaskManager.DAL.ViewModel;
-@model List<TaskManager.Models.Users>
+@model PagedResult<TaskManager.Models.Users>
 @{
     ViewData["Title"] = "TeamGroup";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -18,77 +18,55 @@
     }
 
 </style>
-<div class="row">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex flex-wrap align-items-center justify-content-between breadcrumb-content">
-                    <h5><i class="bi bi-people mr-2"></i>Danh sách người dùng</h5>
 
-                    <div class="d-flex align-items-center">
-                        <div class="iq-search-bar device-search mr-3">
-                            <form id="Search" class="searchbox">
-                                <button type="submit" class="search-link"><i class="ri-search-line"></i></button>
 
-                                <input id="searchtext" maxlength="200" type="text" class="text search-input" placeholder="Tên người dùng...">
-                            </form>
-
-                        </div>
-                        <div class="nav-item nav-icon search-content mr-3">
-                            <a href="javascript:void(0)" class="search-toggle rounded" id="dropdownSearch" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="ri-search-line"> <span style="color:ActiveCaption">Tìm kiếm</span></i>
-                            </a>
-                            <div class="iq-search-bar iq-sub-dropdown dropdown-menu" aria-labelledby="dropdownSearch">
-                                <form id="SearchMobile" class="searchbox p-2">
-                                    <div class="form-group mb-0 position-relative">
-                                        <input id="searchtext2" maxlength="200" class="text search-input font-size-12" placeholder="Tên người dùng...">
-                                        <button type="submit" href="javascript:void(0)" class="search-link"><i class="ri-search-line"></i></button>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <div class="header-title">
+                        <h4 class="card-title"><i class="bi bi-people mr-2"></i>Danh sách người dùng</h4>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row justify-content-between">
+                        <div class="col-sm-6 col-md-6">
+                            <div id="user_list_datatable_info" class="dataTables_filter">
+                                <form class="mr-3 position-relative" id="Search">
+                                    <div class="form-group mb-0">
+                                        <input type="search" class="form-control" id="searchtext" placeholder="Tên người dùng..."
+                                               aria-controls="user-list-table">
+  
                                     </div>
                                 </form>
                             </div>
                         </div>
-
-
-
-                        <div class="list-grid-toggle d-flex align-items-center mr-3">
-                            <button type="button" class="btn btn-warning" id="btnClearSearch">
-                                <i class="bi bi-eraser"></i>
-                            </button>
-                        </div>
-
-
-
-                        <div class="list-grid-toggle d-flex align-items-center mr-3">
-                            <div data-toggle-extra="tab" data-target-extra="#grid" class="active">
-                                <div class="grid-icon mr-3">
-                                    <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="3" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="14" width="7" height="7"></rect>
-                                        <rect x="3" y="14" width="7" height="7"></rect>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div data-toggle-extra="tab" data-target-extra="#list">
-                                <div class="grid-icon">
-                                    <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <line x1="21" y1="10" x2="3" y2="10"></line>
-                                        <line x1="21" y1="6" x2="3" y2="6"></line>
-                                        <line x1="21" y1="14" x2="3" y2="14"></line>
-                                        <line x1="21" y1="18" x2="3" y2="18"></line>
-                                    </svg>
-                                </div>
+                        <div class="col-sm-6 col-md-6">
+                            <div class="user-list-files d-flex">
+                               @*  <a class="bg-primary" href="javascript:void();">
+                                    Print
+                                </a>
+                                <a class="bg-primary" href="javascript:void();">
+                                    Excel
+                                </a>
+                                <a class="bg-primary" href="javascript:void();">
+                                    Pdf
+                                </a> *@
                             </div>
                         </div>
                     </div>
-                </div>
+
+
+                    <div id="roleUser-container">
+                        @Html.Partial("_ListRoleUser", Model)
+                    </div>
+
+                 </div>
+
             </div>
         </div>
     </div>
-</div>
-
-<div id="roleUser-container">
-    @Html.Partial("_ListRoleUser", Model)
 </div>
 
 
@@ -106,7 +84,7 @@
 
                     <div class="row">
                         <div class="col-lg-12">
-                            <input type="hidden" id="userId" name="Id" />
+                            <input type="hidden" id="userIdeditRole" name="Id" />
                         </div>
 
                         <div class="col-lg-12">
@@ -139,19 +117,21 @@
 
 @section Scripts {
     <script>
+        function goToPage(index) {
+            doFilter(index);
+        }
+
         function openPopupEdit(userId, userRole) {
-            $('#userId').val(userId);
+            $('#userIdeditRole').val(userId);
             $('#editRole').val(userRole).selectpicker('refresh');  
 
             $('#updateRoleModal').modal('show');
         }
 
-
-
         $('#updateRoleForm').on('submit', function (e) {
-            e.preventDefault();  
+            e.preventDefault();
 
-            var userId = $('#userId').val();
+            var userId = $('#userIdeditRole').val();
             var newRole = $('#editRole').val();
 
             $.ajax({
@@ -165,10 +145,7 @@
                     if (response.success) {
                         showAlert('Cập nhật thành công!', 'success');
                         $('#updateRoleModal').modal('hide');
-                        $('#roleUser-container').load('/User/_RoleUser', function () {
-                                 let currentView = $('.list-grid-toggle > div.active').data('target-extra');
-                                 restoreProjectView(currentView);
-                             });
+                         doFilter();
                            
                     } else {
                         var mess = response.message || 'Không thể cập nhật vai trò';
@@ -181,23 +158,9 @@
             });
         });
 
-         function restoreProjectView(currentView) {
-            $('.list-grid-toggle > div').removeClass('active');
-            $('.list-grid-toggle > div[data-target-extra="' + currentView + '"]').addClass('active');
-            $('[data-toggle-extra="tab-content"]').removeClass('active');
-            $(currentView).addClass('active');
-        }
-
-       $(document).on('click', '#btnClearSearch', function () {
-            $('#searchtext').val('');
-            $('#searchtext2').val('');
-            doFilter();
-        });
-
-        function doFilter() {
-             const text = $('#searchtext').val().trim();
-             const text2 = $('#searchtext2').val().trim();
-             let currentView = $('.list-grid-toggle > div.active').data('target-extra');
+        function doFilter(pageIndex = 1) {
+             const text = $('#searchtext').val();
+             const text2 = $('#searchtext2').val();
 
              let ptextsearch = '';
                   if (window.innerWidth <= 576) {
@@ -210,11 +173,12 @@
                       url: '/User/_RoleUser',
                       type: 'GET',
                       data: {
-                          searchText: ptextsearch
+                          searchText: ptextsearch,
+                          PageIndex: pageIndex,
+                          PageSize: 5
                       },
                       success: function (html) {
                           $('#roleUser-container').html(html);
-                          restoreProjectView(currentView);
                       },
                       error: function () {
                           showAlert('Lỗi khi lọc người dùng', 'error');
@@ -222,16 +186,18 @@
                   });
         }
 
-           $(document).ready(function () {
-            $('#Search').on('submit', function (e) {
-                e.preventDefault();
-                doFilter();
-            });
+        $(document).ready(function () {
+                $('#Search').on('submit', function (e) {
+                    e.preventDefault();
+                    doFilter();
+                });
 
-            $('#SearchMobile').on('submit', function (e) {
-                e.preventDefault();
-                doFilter();
-            });
+                $('#searchtext').on('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        doFilter();
+                    }
+                });
         });
 
 

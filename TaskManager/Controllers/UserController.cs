@@ -446,7 +446,25 @@ namespace TaskManager.Controllers
                 return RedirectToAction("Index", "Home");
 
             var models = _userService.GetAllUser();
-            return View(models);
+            int pageIndex = 1;
+            int pageSize = 5;
+            int totalItems = models.Count;
+
+            var pagedUsers = models
+                            .Skip((pageIndex - 1) * pageSize)
+                            .Take(pageSize)
+                            .ToList();
+
+            var result = new PagedResult<Users>
+            {
+                Items = pagedUsers,
+                TotalItems = totalItems,
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            };
+
+
+            return View(result);
         }
         public IActionResult _RoleUser(RoleUserParam param)
         {
@@ -468,7 +486,22 @@ namespace TaskManager.Controllers
                     .ToList();
             }
 
-            return PartialView("_ListRoleUser", models);
+            int totalItems = models.Count;
+            var pagedItems = models
+                .Skip((param.PageIndex - 1) * param.PageSize)
+                .Take(param.PageSize)
+                .ToList();
+
+            var result = new PagedResult<Users>
+            {
+                Items = pagedItems,
+                TotalItems = totalItems,
+                PageIndex = param.PageIndex,
+                PageSize = param.PageSize
+            };
+
+
+            return PartialView("_ListRoleUser", result);
         }
         [HttpPost]
         public IActionResult UpdateRole(int? Id, int? Role)

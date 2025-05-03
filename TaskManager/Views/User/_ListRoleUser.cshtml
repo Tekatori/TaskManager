@@ -1,8 +1,8 @@
 ﻿@using TaskManager.DAL.ViewModel;
-@model List<TaskManager.Models.Users>
+@model PagedResult<TaskManager.Models.Users>
 
 
-<div id="grid" class="item-content animate__animated animate__fadeIn active" data-toggle-extra="tab-content">
+@* <div id="grid" class="item-content animate__animated animate__fadeIn active" data-toggle-extra="tab-content">
     <div class="row">
         @if (!Model.Any())
         {
@@ -120,4 +120,104 @@
             </tbody>
         </table>
     </div>
-</div>
+</div> *@
+
+
+
+@if (!Model.Items.Any() && Model != null)
+{
+
+
+	<div colspan="5" class="text-center" style="margin-top:10px">
+		<H3 class="text-center text-muted"><i class="ri-information-line mr-2"></i> Không tìm thấy người dùng</H3>
+	</div>
+}
+else
+{
+    <div class="table-responsive">
+	<table id="user-list-table" class="table table-striped dataTable mt-4" role="grid"
+		   aria-describedby="user-list-page-info">
+		<thead>
+			<tr class="ligth">
+				<th>Tên người dùng</th>
+				<th>Email</th>
+				<th>Loại người dùng</th>
+				<th style="min-width: 100px">Hành động</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var team in Model.Items)
+			{
+				<tr>
+					<td>@team.Username</td>
+					<td>@team.Email</td>
+					@{
+						var GetNameRole = team.Role switch
+						{
+							(int)CommonEnums.Role.Admin => CommonEnums.GetDescription(CommonEnums.Role.Admin),
+							(int)CommonEnums.Role.User => CommonEnums.GetDescription(CommonEnums.Role.User),
+							(int)CommonEnums.Role.Leader => CommonEnums.GetDescription(CommonEnums.Role.Leader),
+							_ => "Người dùng"
+						};
+						var iconClass = team.Role switch
+						{
+							(int)CommonEnums.Role.Admin => "ri-admin-fill",
+							(int)CommonEnums.Role.User => "ri-user-fill",
+							(int)CommonEnums.Role.Leader => "ri-team-fill",
+							_ => "ri-user-fill"
+						};
+					}
+
+					<td><i class="@iconClass mr-2"></i>@GetNameRole</td>
+					<td>
+						<div class="flex align-items-center list-user-action">
+							@*  <a class="btn btn-sm bg-primary" data-toggle="tooltip" data-placement="top" title=""
+                                       data-original-title="Add" href="#"><i class="ri-user-add-line mr-0"></i></a> *@
+							<a onclick="openPopupEdit(@team.Id, @team.Role)" class="btn btn-sm bg-primary" data-toggle="tooltip" data-placement="top" title=""
+							   data-original-title="Edit" href="javascript:void();"><i class="ri-pencil-line mr-0"></i></a>
+							@*  <a class="btn btn-sm bg-primary" data-toggle="tooltip" data-placement="top" title=""
+                                       data-original-title="Delete" href="#"><i class="ri-delete-bin-line mr-0"></i></a> *@
+
+						</div>
+					</td>
+				</tr>
+			}
+		</tbody>
+        </table> 
+    </div>
+
+    int totalPages = (int)Math.Ceiling((double)Model.TotalItems / Model.PageSize);
+    
+
+    <ul class="pagination justify-content-end" style="padding-top:20px">
+        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
+            <a class="page-link" href="javascript:void(0);" onclick="goToPage(1)">Đầu</a>
+        </li>
+
+        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
+            <a class="page-link" href="javascript:void(0);" onclick="goToPage(@(Model.PageIndex - 1))">Trước</a>
+        </li>
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                <a class="page-link" href="javascript:void(0);" onclick="goToPage(@i)">
+                    @i
+                </a>
+            </li>
+        }
+
+        <li class="page-item @(Model.PageIndex == totalPages ? "disabled" : "")">
+            <a class="page-link" href="javascript:void(0);" onclick="goToPage(@(Model.PageIndex + 1))">Sau</a>
+        </li>
+
+        <li class="page-item @(Model.PageIndex == totalPages ? "disabled" : "")">
+            <a class="page-link" href="javascript:void(0);" onclick="goToPage(@totalPages)">Cuối</a>
+        </li>
+    </ul>
+
+}
+
+
+       
+
+
