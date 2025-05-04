@@ -1,57 +1,116 @@
-TaskManager
-TaskManager là một ứng dụng quản lý dự án và công việc, cho phép người dùng tạo, theo dõi và quản lý các nhiệm vụ trong các dự án khác nhau. Ứng dụng được xây dựng với kiến trúc phân lớp, bao gồm các tầng:
 
-TaskManager.BLL: Business Logic Layer – Xử lý các logic nghiệp vụ.
+# TaskManager
 
-TaskManager.DAL: Data Access Layer – Quản lý truy cập dữ liệu.
+**TaskManager** là một ứng dụng web giúp bạn quản lý dự án và công việc hiệu quả. Dự án được xây dựng bằng ASP.NET Core MVC theo mô hình phân lớp (BLL, DAL, Models, MVC) và sử dụng **MySQL** làm hệ quản trị cơ sở dữ liệu.
 
-TaskManager.Models: Định nghĩa các mô hình dữ liệu.
+## 💡 Tính năng
 
-TaskManager: Giao diện người dùng và điểm khởi đầu của ứng dụng.
+- Đăng nhập, đăng ký người dùng.
+- Quản lý vai trò người dùng (role).
+- Tạo và quản lý dự án.
+- Tạo, sửa, xóa công việc (task) gắn với dự án.
+- Giao nhiệm vụ cho người dùng.
+- Giao diện Dashboard hiển thị thống kê tổng quan:
+  - Số lượng dự án, nhiệm vụ, người dùng, bình luận, tệp đính kèm.
+  - Các công việc gần đến deadline.
+  - Người dùng mới được tạo gần đây.
+- Bình luận vào công việc.
+- Đính kèm tệp.
 
-Tính năng
-Quản lý người dùng với các vai trò khác nhau.
+## 🧱 Kiến trúc dự án
 
-Tạo và quản lý dự án.
+- **TaskManager.Models**: Định nghĩa các mô hình (Entity).
+- **TaskManager.DAL**: Truy cập dữ liệu, thao tác với MySQL qua EF Core.
+- **TaskManager.BLL**: Chứa logic nghiệp vụ.
+- **TaskManager (Web MVC)**: Giao diện người dùng và điều phối luồng xử lý.
 
-Tạo, cập nhật và theo dõi tiến độ công việc.
+## ⚙️ Cài đặt và chạy dự án
 
-Thêm bình luận vào các công việc.
+### 1. Clone dự án
 
-Phân quyền và phân công công việc cho người dùng.
-
-Cấu trúc cơ sở dữ liệu
-Cơ sở dữ liệu bao gồm các bảng chính:
-
-Users: Lưu thông tin người dùng.
-
-Projects: Lưu thông tin dự án.
-
-Tasks: Lưu thông tin công việc.
-
-Comments: Lưu bình luận liên quan đến công việc.
-
-Chi tiết cấu trúc bảng có thể được tìm thấy trong tệp README.md hiện tại của kho lưu trữ.
-
-Cài đặt
-Clone kho lưu trữ:
-
-bash
-Sao chép
-Chỉnh sửa
+```bash
 git clone https://github.com/Tekatori/TaskManager.git
-Mở tệp TaskManager.sln bằng Visual Studio.
+```
 
-Khôi phục các gói NuGet cần thiết.
+Mở file `TaskManager.sln` bằng **Visual Studio 2022** hoặc mới hơn.
 
-Cấu hình chuỗi kết nối đến cơ sở dữ liệu trong tệp cấu hình.
+### 2. Tạo cơ sở dữ liệu MySQL
 
-Chạy ứng dụng và bắt đầu sử dụng.
+Sử dụng MySQL Workbench hoặc dòng lệnh để tạo database:
 
-Đóng góp
-Chúng tôi hoan nghênh mọi đóng góp từ cộng đồng. Nếu bạn muốn đóng góp, vui lòng fork kho lưu trữ, tạo nhánh mới và gửi pull request.
+```sql
+CREATE DATABASE task_manager_db;
+```
 
-Giấy phép
-Dự án này được cấp phép theo giấy phép MIT.
+### 3. Cập nhật chuỗi kết nối
 
-Nếu bạn cần thêm thông tin hoặc hỗ trợ, vui lòng liên hệ với chúng tôi qua email hoặc tạo issue trên GitHub.
+Trong file `appsettings.json` của project `TaskManager`, sửa lại như sau:
+
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "server=localhost;port=3306;database=task_manager_db;user=root;password=your_password"
+}
+```
+
+> Thay `your_password` bằng mật khẩu thật của MySQL.
+
+### 4. Tạo bảng trong CSDL
+
+Nếu bạn đã có migration sẵn:
+
+```bash
+dotnet ef database update
+```
+
+Nếu chưa có, bạn có thể tạo migration đầu tiên:
+
+```bash
+dotnet ef migrations add InitialCreate
+dotnet ef database update
+```
+
+> Cài EF tool nếu cần:
+```bash
+dotnet tool install --global dotnet-ef
+```
+
+### 5. Chạy ứng dụng
+
+Nhấn **F5** trên Visual Studio hoặc chạy lệnh:
+
+```bash
+dotnet run --project TaskManager
+```
+
+Ứng dụng sẽ chạy tại `https://localhost:5001` hoặc `http://localhost:5000`.
+
+---
+
+## 📌 Yêu cầu
+
+- [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
+- MySQL Server 5.7+ / 8.0
+- Visual Studio 2022 hoặc sử dụng CLI (.NET CLI)
+
+---
+
+## 📷 Demo (nếu có)
+
+> (Bạn có thể thêm ảnh chụp màn hình ở đây nếu muốn trình bày UI Dashboard hoặc các chức năng)
+
+---
+
+## 🤝 Đóng góp
+
+Chào mừng mọi đóng góp! Bạn có thể:
+
+- Fork dự án
+- Tạo nhánh mới: `git checkout -b chuc-nang-moi`
+- Commit & Push: `git push origin chuc-nang-moi`
+- Tạo Pull Request
+
+---
+
+## 📄 Giấy phép
+
+Dự án này sử dụng giấy phép **MIT License**.
