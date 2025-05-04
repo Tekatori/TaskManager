@@ -96,7 +96,9 @@ dotnet run --project TaskManager
 
 ## 📷 Demo (nếu có)
 
-> (Bạn có thể thêm ảnh chụp màn hình ở đây nếu muốn trình bày UI Dashboard hoặc các chức năng)
+![Dashboard](wwwroot/img/dashboard.png)
+![Calendar](wwwroot/img/calendar.png)
+![Home](wwwroot/img/home.png)
 
 ---
 
