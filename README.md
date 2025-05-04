@@ -96,9 +96,9 @@ dotnet run --project TaskManager
 
 ## 📷 Demo (nếu có)
 
-![Dashboard](wwwroot/img/dashboard.png)
-![Calendar](wwwroot/img/calendar.png)
-![Home](wwwroot/img/home.png)
+![Dashboard](TaskManager/wwwroot/img/dashboard.png)
+![Calendar](TaskManager/wwwroot/img/calendar.png)
+![Home](TaskManager/wwwroot/img/home.png)
 
 ---
 
