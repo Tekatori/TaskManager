@@ -1,52 +1,116 @@
-SQL
-USE TaskManagerDB;
--- 1. Users
-CREATE TABLE Users (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    Username VARCHAR(100) NOT NULL,
-    Email VARCHAR(150) NOT NULL UNIQUE,
-    PasswordHash TEXT NOT NULL,
-    Role VARCHAR(50) NOT NULL DEFAULT 'User',
-    CreatedAt DATETIME
-);
 
--- 2. Projects
-CREATE TABLE Projects (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(255) NOT NULL,
-    Description TEXT,
-    OwnerId INT,  -- Giữ lại OwnerId để liên kết với Users(Id)
-    CreatedAt DATETIME
-);
+# TaskManager
 
--- 3. Tasks
-CREATE TABLE Tasks (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    Title VARCHAR(255) NOT NULL,
-    Description TEXT,
-    Status ENUM('Pending', 'InProgress', 'Done') DEFAULT 'Pending',
-    Priority ENUM('Low', 'Medium', 'High') DEFAULT 'Medium',
-    DueDate DATETIME,
-    ProjectId INT,      -- Giữ để liên kết Projects
-    AssignedTo INT,     -- Giữ để liên kết Users
-    CreatedAt DATETIME,
-    UpdatedAt DATETIME
-);
+**TaskManager** là một ứng dụng web giúp bạn quản lý dự án và công việc hiệu quả. Dự án được xây dựng bằng ASP.NET Core MVC theo mô hình phân lớp (BLL, DAL, Models, MVC) và sử dụng **MySQL** làm hệ quản trị cơ sở dữ liệu.
 
--- 4. Comments
-CREATE TABLE Comments (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    TaskId INT NOT NULL,   -- Liên kết với Tasks
-    UserId INT NOT NULL,   -- Liên kết với Users
-    Content TEXT NOT NULL,
-    CreatedAt DATETIME
-);
+## 💡 Tính năng
 
--- 5. Attachments
-CREATE TABLE Attachments (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    TaskId INT NOT NULL,       -- Liên kết với Tasks
-    FileName VARCHAR(255) NOT NULL,
-    FileUrl TEXT NOT NULL,
-    UploadedAt DATETIME
-);
+- Đăng nhập, đăng ký người dùng.
+- Quản lý vai trò người dùng (role).
+- Tạo và quản lý dự án.
+- Tạo, sửa, xóa công việc (task) gắn với dự án.
+- Giao nhiệm vụ cho người dùng.
+- Giao diện Dashboard hiển thị thống kê tổng quan:
+  - Số lượng dự án, nhiệm vụ, người dùng, bình luận, tệp đính kèm.
+  - Các công việc gần đến deadline.
+  - Người dùng mới được tạo gần đây.
+- Bình luận vào công việc.
+- Đính kèm tệp.
+
+## 🧱 Kiến trúc dự án
+
+- **TaskManager.Models**: Định nghĩa các mô hình (Entity).
+- **TaskManager.DAL**: Truy cập dữ liệu, thao tác với MySQL qua EF Core.
+- **TaskManager.BLL**: Chứa logic nghiệp vụ.
+- **TaskManager (Web MVC)**: Giao diện người dùng và điều phối luồng xử lý.
+
+## ⚙️ Cài đặt và chạy dự án
+
+### 1. Clone dự án
+
+```bash
+git clone https://github.com/Tekatori/TaskManager.git
+```
+
+Mở file `TaskManager.sln` bằng **Visual Studio 2022** hoặc mới hơn.
+
+### 2. Tạo cơ sở dữ liệu MySQL
+
+Sử dụng MySQL Workbench hoặc dòng lệnh để tạo database:
+
+```sql
+CREATE DATABASE task_manager_db;
+```
+
+### 3. Cập nhật chuỗi kết nối
+
+Trong file `appsettings.json` của project `TaskManager`, sửa lại như sau:
+
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "server=localhost;port=3306;database=task_manager_db;user=root;password=your_password"
+}
+```
+
+> Thay `your_password` bằng mật khẩu thật của MySQL.
+
+### 4. Tạo bảng trong CSDL
+
+Nếu bạn đã có migration sẵn:
+
+```bash
+dotnet ef database update
+```
+
+Nếu chưa có, bạn có thể tạo migration đầu tiên:
+
+```bash
+dotnet ef migrations add InitialCreate
+dotnet ef database update
+```
+
+> Cài EF tool nếu cần:
+```bash
+dotnet tool install --global dotnet-ef
+```
+
+### 5. Chạy ứng dụng
+
+Nhấn **F5** trên Visual Studio hoặc chạy lệnh:
+
+```bash
+dotnet run --project TaskManager
+```
+
+Ứng dụng sẽ chạy tại `https://localhost:5001` hoặc `http://localhost:5000`.
+
+---
+
+## 📌 Yêu cầu
+
+- [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
+- MySQL Server 5.7+ / 8.0
+- Visual Studio 2022 hoặc sử dụng CLI (.NET CLI)
+
+---
+
+## 📷 Demo (nếu có)
+
+> (Bạn có thể thêm ảnh chụp màn hình ở đây nếu muốn trình bày UI Dashboard hoặc các chức năng)
+
+---
+
+## 🤝 Đóng góp
+
+Chào mừng mọi đóng góp! Bạn có thể:
+
+- Fork dự án
+- Tạo nhánh mới: `git checkout -b chuc-nang-moi`
+- Commit & Push: `git push origin chuc-nang-moi`
+- Tạo Pull Request
+
+---
+
+## 📄 Giấy phép
+
+Dự án này sử dụng giấy phép **MIT License**.
