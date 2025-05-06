@@ -88,7 +88,7 @@ dotnet run --project TaskManager
 
 ## 📌 Yêu cầu
 
-- [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - MySQL Server 5.7+ / 8.0
 - Visual Studio 2022 hoặc sử dụng CLI (.NET CLI)
 
